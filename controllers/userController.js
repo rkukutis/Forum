@@ -1,9 +1,16 @@
 const User = require('../models/usersModel');
+const APIFeatures = require('../routes/utils/apiFeatures');
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const allUsers = await User.find();
-    res.status(200).json({ status: 'success', data: allUsers });
+    const features = new APIFeatures(User.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+
+    const users = await features.query;
+    res.status(200).json({ status: 'success', data: users });
   } catch (err) {
     res.status(400).json({ status: 'error', message: err });
   }
