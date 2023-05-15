@@ -5,6 +5,8 @@ const express = require('express');
 const morgan = require('morgan');
 
 const userRoutes = require('./routes/userRoutes');
+const AppError = require('./routes/utils/AppError');
+const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
@@ -33,5 +35,12 @@ app.use('/users', userRoutes);
 app.get('*', (req, res) => {
   res.redirect('/home.html');
 });
+
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
+  // if next() receives an argument, express assumes an error has occured
+});
+
+app.use(globalErrorHandler);
 
 module.exports = app;

@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema(
     profileImg: { type: String, default: 'default.png' },
     userType: { type: String, default: 'user' },
     password: { type: String, required: true },
+    email: { type: String, required: true },
     upvotes: { type: Number, default: 0 },
     downvotes: { type: Number, default: 0 },
   },
