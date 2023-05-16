@@ -5,6 +5,7 @@ const express = require('express');
 const morgan = require('morgan');
 
 const userRoutes = require('./routes/userRoutes');
+const postRoutes = require('./routes/postRoutes');
 const AppError = require('./routes/utils/AppError');
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -28,12 +29,13 @@ app.get('/', (req, res) => {
   res.status(200).send('Hello from root');
 });
 
-// Mounting users router
+// Mounting routers
 app.use('/users', userRoutes);
+app.use('/posts', postRoutes);
 
 // Redirects unhandled routes to root
 app.get('*', (req, res) => {
-  res.redirect('/home.html');
+  res.end();
 });
 
 app.all('*', (req, res, next) => {
