@@ -1,4 +1,4 @@
-const User = require('../models/usersModel');
+const User = require('../models/userModel');
 const APIFeatures = require('../routes/utils/apiFeatures');
 const catchAsync = require('../routes/utils/catchAsync');
 const AppError = require('../routes/utils/AppError');
@@ -12,12 +12,6 @@ exports.getAllUsers = catchAsync(async (req, res) => {
 
   const users = await features.query;
   res.status(200).json({ status: 'success', data: users });
-});
-
-exports.createUser = catchAsync(async (req, res, next) => {
-  console.log(req.body);
-  const newUser = await User.create(req.body);
-  res.status(201).json({ status: 'success', message: newUser });
 });
 
 exports.getUser = catchAsync(async (req, res, next) => {

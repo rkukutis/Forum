@@ -10,6 +10,7 @@
   "author": "Rick Hoopoe",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "eslint": "^8.39.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -20,6 +21,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^5.13.17",
     "morgan": "^1.10.0",
     "prettier": "^2.8.8",
