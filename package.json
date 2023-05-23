@@ -10,7 +10,6 @@
   "author": "Rick Hoopoe",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "eslint": "^8.39.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -22,11 +21,10 @@
     "eslint-plugin-react": "^7.32.2",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^5.13.17",
     "morgan": "^1.10.0",
+    "pg-promise": "^11.4.3",
     "prettier": "^2.8.8",
-    "slugify": "^1.6.6",
-    "validator": "^13.9.0"
+    "slugify": "^1.6.6"
   },
   "engines": {
     "node": ">10.6.0"
