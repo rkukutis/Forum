@@ -1,11 +1,13 @@
 const errors = require('eslint-plugin-import/config/errors');
 const db = require('../database');
+const passwordHash = require('../passwordHash');
 
 // GENERIC TABLE MANIPULATION FUNCTIONS
 
 // INSERTS OBJECT DATA INTO SPECIFIED TABLE
 const insertData = async (data, table) => {
   try {
+    if (data.password) data.password = await passwordHash(data.password);
     const pairs = Object.entries(data);
     const keys = pairs.map((el) => `${el[0]}`).join(', ');
     const vars = pairs.map((el, i) => `$${i + 1}`).join(', ');
