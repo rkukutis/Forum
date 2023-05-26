@@ -1,6 +1,3 @@
-///////////////////////
-// The app.js file is mostly used for middleware declarations
-
 const express = require('express');
 const morgan = require('morgan');
 
@@ -8,11 +5,12 @@ const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
+// enable logging if in development mode
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 app.use(express.json());
 
-// User middleware
-app.use(express.static(`${__dirname}/public`));
+// Serve files from public page
+// app.use(express.static(`${__dirname}/public`));
 
 /////////////////////////////////////////////////////////
 
@@ -24,7 +22,6 @@ app.get('/', (req, res) => {
 // Mounting routers
 app.use('/users', userRoutes);
 
-// Redirects unhandled routes to root
 app.get('*', (req, res) => {
   res.end();
 });
