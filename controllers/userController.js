@@ -1,48 +1,102 @@
-const User = require('../models/userModel');
-const APIFeatures = require('../routes/utils/apiFeatures');
-const catchAsync = require('../routes/utils/catchAsync');
-const AppError = require('../routes/utils/AppError');
+const errors = require('eslint-plugin-import/config/errors');
+const db = require('../database');
+const passwordHash = require('../passwordHash');
 
-exports.getAllUsers = catchAsync(async (req, res) => {
-  const features = new APIFeatures(User.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
+// GENERIC TABLE MANIPULATION FUNCTIONS
 
-  const users = await features.query;
-  res.status(200).json({ status: 'success', data: users });
-});
-
-exports.getUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
-
-  if (!user) {
-    // Return because we dont want to return the 200 response below
-    return next(new AppError('No user found with this ID', 404));
+// INSERTS OBJECT DATA INTO SPECIFIED TABLE
+const insertData = async (data, table) => {
+  try {
+    if (data.password) data.password = await passwordHash(data.password);
+    const pairs = Object.entries(data);
+    const keys = pairs.map((el) => `${el[0]}`).join(', ');
+    const vars = pairs.map((el, i) => `$${i + 1}`).join(', ');
+    const values = pairs.map((el) => `${el[1]}`);
+    const queryString = `INSERT INTO ${table}(${keys}) VALUES(${vars})`;
+    console.log(queryString);
+    await db.none(queryString, values);
+  } catch (error) {
+    console.error('ERROR:', error); // print error;
   }
+};
 
-  res.status(200).json({ status: 'success', message: user });
-});
+const deleteAllData = async (table) => {
+  await db.none(`DELETE FROM ${table}`);
+};
 
-exports.updateUser = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(req.params.id);
+const getAllData = async (table) => await db.any(`SELECT * FROM ${table}`);
 
-  if (!user) {
-    // Return because we dont want to return the 200 response below
-    return next(new AppError('No user found with this ID', 404));
+const selectEntry = async (action, table, column, value) =>
+  await db.oneOrNone(
+    `${action.toUpperCase()} ${
+      action === 'delete' ? '' : '*'
+    } FROM ${table} WHERE ${column} = $1`,
+    [value]
+  );
+
+const updateEntry = async (table, data, column, value) => {
+  try {
+    const pairs = Object.entries(data);
+    const setString = pairs.map((el) => `${el[0]}='${el[1]}'`).join(', ');
+    const queryString = `UPDATE ${table} SET ${setString} WHERE ${column}= ${value};`;
+    await db.none(queryString);
+  } catch (error) {
+    console.log(error);
   }
+};
 
-  res.status(200).json({ status: 'success', message: user });
-});
+/////////////////////////////////////////////////////////////////
 
-exports.deleteUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+exports.createUser = async (req, res) => {
+  const data = await insertData(req.body, 'users');
+  console.log(data);
+  res.status(200).json({ status: 'success', data: req.body });
+};
 
-  if (!user) {
-    // Return because we dont want to return the 200 response below
-    return next(new AppError('No user found with this ID', 404));
+exports.getDataUsers = async (req, res) => {
+  try {
+    const data = await getAllData('users');
+    res.status(200).json({ status: 'success', data });
+  } catch (error) {
+    console.error('ERROR:', error);
   }
+};
 
-  res.status(204).json({ status: 'success', message: user });
-});
+exports.getUserData = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await selectEntry('select', 'users', 'id', userId);
+    res.status(200).json({ status: 'success', data: user });
+  } catch (error) {
+    console.error('ERROR:', error);
+  }
+};
+
+exports.deleteAllUsers = async (req, res) => {
+  try {
+    deleteAllData('users');
+    res.status(204).json({ status: 'success' });
+  } catch (error) {
+    console.log('ERROR:', error);
+  }
+};
+exports.deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    await selectEntry('delete', 'users', 'id', userId);
+    res.status(204).json({ status: 'success' });
+  } catch (error) {
+    console.log('ERROR:', error);
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    await updateEntry('users', req.body, 'id', userId);
+    // await db.none('UPDATE users SET active = $1 WHERE id = $2', [true, 123]);
+    res.status(200).json({ status: 'success' });
+  } catch (error) {
+    console.log('ERROR:', error);
+  }
+};
