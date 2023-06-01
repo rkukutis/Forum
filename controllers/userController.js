@@ -1,4 +1,3 @@
-const errors = require('eslint-plugin-import/config/errors');
 const db = require('../database');
 const passwordHash = require('../passwordHash');
 
@@ -7,13 +6,13 @@ const passwordHash = require('../passwordHash');
 // INSERTS OBJECT DATA INTO SPECIFIED TABLE
 const insertData = async (data, table) => {
   try {
+    // hash password if present
     if (data.password) data.password = await passwordHash(data.password);
     const pairs = Object.entries(data);
     const keys = pairs.map((el) => `${el[0]}`).join(', ');
     const vars = pairs.map((el, i) => `$${i + 1}`).join(', ');
     const values = pairs.map((el) => `${el[1]}`);
     const queryString = `INSERT INTO ${table}(${keys}) VALUES(${vars})`;
-    console.log(queryString);
     await db.none(queryString, values);
   } catch (error) {
     console.error('ERROR:', error); // print error;
@@ -21,7 +20,8 @@ const insertData = async (data, table) => {
 };
 
 const deleteAllData = async (table) => {
-  await db.none(`DELETE FROM ${table}`);
+  await db.none(`TRUNCATE TABLE ${table}`);
+  await db.none(`ALTER SEQUENCE ${table}_id_seq RESTART WITH 1`);
 };
 
 const getAllData = async (table) => await db.any(`SELECT * FROM ${table}`);
