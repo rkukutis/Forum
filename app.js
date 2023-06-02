@@ -2,6 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 
 const userRoutes = require('./routes/userRoutes');
+const postRoutes = require('./routes/postRoutes');
+const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
@@ -21,9 +23,12 @@ app.get('/', (req, res) => {
 
 // Mounting routers
 app.use('/users', userRoutes);
+app.use('/posts', postRoutes);
 
 app.get('*', (req, res) => {
   res.end();
 });
+
+app.use(globalErrorHandler);
 
 module.exports = app;

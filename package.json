@@ -1,7 +1,7 @@
 {
   "name": "hoopoe-forum",
   "version": "1.0.0",
-  "description": "Learning node, express and mongoDB",
+  "description": "Forum",
   "main": "app.js",
   "scripts": {
     "start:prod": "SET NODE_ENV=production&& nodemon server.js",
