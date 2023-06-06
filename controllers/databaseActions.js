@@ -19,7 +19,8 @@ module.exports = {
       const queryString = `INSERT INTO ${table}(${keys}) VALUES(${vars})`;
       await db.none(queryString, values);
     } catch (error) {
-      throw new AppError('Cant insert data', 500);
+      console.log(error);
+      throw new AppError(`${error}`, 500);
     }
   },
 
@@ -28,7 +29,24 @@ module.exports = {
     await db.none(`ALTER SEQUENCE ${table}_id_seq RESTART WITH 1`);
   },
 
-  getAllData: async (table) => await db.any(`SELECT * FROM ${table}`),
+  getAllData: async (table, query) => {
+    console.log(query);
+    const features = [];
+    if ('sort' in query) {
+      const sortDirection = query.sort.startsWith('-') ? 'DESC' : 'ASC';
+      features.push(
+        `ORDER BY ${query.sort.slice(
+          sortDirection === 'DESC' ? 1 : 0
+        )} ${sortDirection}`
+      );
+    }
+    if ('limit' in query) features.push(`LIMIT ${query.limit}`);
+    if ('page' in query)
+      features.push(`OFFSET ${(query.page - 1) * query.limit}`);
+    const featuresString = features.join(' ');
+    console.log(featuresString);
+    return await db.any(`SELECT * FROM ${table} ${featuresString}`);
+  },
 
   selectEntry: async (action, table, column, value) =>
     await db.oneOrNone(

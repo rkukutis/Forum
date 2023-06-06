@@ -5,11 +5,6 @@ const passwordHash = require('../passwordHash');
 const catchAsync = require('../utils/catchAsync');
 const { insertData } = require('./databaseActions');
 
-exports.login = async (req, res) => {
-  console.log(req.headers.authorization);
-  res.status(200).json({ status: 'ok' });
-};
-
 const signToken = (username, email) =>
   jwt.sign({ username, email }, process.env.JWT_SECRET);
 

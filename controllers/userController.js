@@ -16,7 +16,7 @@ exports.createUser = catchAsync(async (req, res, next) => {
 });
 
 exports.getDataUsers = catchAsync(async (req, res, next) => {
-  const data = await getAllData('users');
+  const data = await getAllData('users', req.query);
   res.status(200).json({ status: 'success', data });
 });
 
