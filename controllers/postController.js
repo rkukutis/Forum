@@ -8,9 +8,13 @@ const {
 } = require('./databaseActions');
 
 exports.createPost = catchAsync(async (req, res, next) => {
-  const data = await insertData(req.body, 'posts');
-  console.log(data);
-  res.status(200).json({ status: 'success', data: req.body });
+  const post = {
+    title: req.title,
+    body: req.body,
+    user_id: req.user.id,
+  };
+  await insertData(req.body, 'posts');
+  res.status(200).json({ status: 'success', data: post });
 });
 
 exports.getAllPosts = catchAsync(async (req, res, next) => {

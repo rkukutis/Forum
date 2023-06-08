@@ -19,42 +19,52 @@ module.exports = {
       const queryString = `INSERT INTO ${table}(${keys}) VALUES(${vars})`;
       await db.none(queryString, values);
     } catch (error) {
-      console.log(error);
-      throw new AppError(`${error}`, 500);
+      throw new AppError(error, 500);
     }
   },
 
   deleteAllData: async (table) => {
-    await db.none(`TRUNCATE TABLE ${table}`);
-    await db.none(`ALTER SEQUENCE ${table}_id_seq RESTART WITH 1`);
+    try {
+      await db.none(`TRUNCATE TABLE ${table} CASCADE`);
+      await db.none(`ALTER SEQUENCE ${table}_id_seq RESTART WITH 1`);
+    } catch (error) {
+      throw new AppError(error, 500);
+    }
   },
 
   getAllData: async (table, query) => {
-    console.log(query);
-    const features = [];
-    if ('sort' in query) {
-      const sortDirection = query.sort.startsWith('-') ? 'DESC' : 'ASC';
-      features.push(
-        `ORDER BY ${query.sort.slice(
-          sortDirection === 'DESC' ? 1 : 0
-        )} ${sortDirection}`
-      );
+    try {
+      const features = [];
+      if ('sort' in query) {
+        const sortDirection = query.sort.startsWith('-') ? 'DESC' : 'ASC';
+        features.push(
+          `ORDER BY ${query.sort.slice(
+            sortDirection === 'DESC' ? 1 : 0
+          )} ${sortDirection}`
+        );
+      }
+      if ('limit' in query) features.push(`LIMIT ${query.limit}`);
+      if ('page' in query)
+        features.push(`OFFSET ${(query.page - 1) * query.limit}`);
+      const featuresString = features.join(' ');
+      return await db.any(`SELECT * FROM ${table} ${featuresString}`);
+    } catch (error) {
+      throw new AppError(error, 500);
     }
-    if ('limit' in query) features.push(`LIMIT ${query.limit}`);
-    if ('page' in query)
-      features.push(`OFFSET ${(query.page - 1) * query.limit}`);
-    const featuresString = features.join(' ');
-    console.log(featuresString);
-    return await db.any(`SELECT * FROM ${table} ${featuresString}`);
   },
 
-  selectEntry: async (action, table, column, value) =>
-    await db.oneOrNone(
-      `${action.toUpperCase()} ${
-        action === 'delete' ? '' : '*'
-      } FROM ${table} WHERE ${column} = $1`,
-      [value]
-    ),
+  selectEntry: async (action, table, column, value) => {
+    try {
+      await db.oneOrNone(
+        `${action.toUpperCase()} ${
+          action === 'delete' ? '' : '*'
+        } FROM ${table} WHERE ${column} = $1`,
+        [value]
+      );
+    } catch (error) {
+      throw new AppError(error, 500);
+    }
+  },
 
   updateEntry: async (table, data, column, value) => {
     try {
@@ -65,7 +75,7 @@ module.exports = {
       const queryString = `UPDATE ${table} SET ${setString} WHERE ${column}= ${value};`;
       await db.none(queryString);
     } catch (error) {
-      throw new AppError('Cant update data', 500);
+      throw new AppError(error, 500);
     }
   },
 };

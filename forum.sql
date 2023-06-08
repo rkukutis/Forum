@@ -15,7 +15,7 @@ CREATE TABLE "users" (
   "email" VARCHAR NOT NULL UNIQUE,
   "password"  varchar NOT NULL,
   "role" role NOT NULL DEFAULT('user'),
-  "status" status,
+  "status" status DEFAULT('active'),
   "created_at" TIMESTAMP NOT NULL DEFAULT(NOW())
 );
 CREATE TABLE "posts" (

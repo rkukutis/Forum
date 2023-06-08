@@ -9,7 +9,7 @@ router.post('/login', authController.login);
 router
   .route('/:id')
   .get(userController.getUserData)
-  .delete(userController.deleteUser)
+  .delete(authController.protect, userController.deleteUser)
   .patch(userController.updateUser);
 router
   .route('/')

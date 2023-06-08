@@ -1,5 +1,6 @@
 const express = require('express');
 const postController = require('../controllers/postController');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ router
   .patch(postController.updatePost);
 router
   .route('/')
-  .post(postController.createPost)
+  .post(authController.protect, postController.createPost)
   .get(postController.getAllPosts)
   .delete(postController.deleteAllPosts);
 

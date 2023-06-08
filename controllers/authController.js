@@ -9,12 +9,12 @@ const signToken = (username, email) =>
   jwt.sign({ username, email }, process.env.JWT_SECRET);
 
 exports.createUser = catchAsync(async (req, res, next) => {
-  console.log(req.body);
   // 1) Get user data from request body
   const { username, email } = req.body;
   // 2) Create token
   const token = signToken(username, email);
   const data = await insertData(req.body, 'users');
+  res.cookie('jwt', token, { maxAge: 30 * 60 * 1000 });
   res.status(200).json({ status: 'success', data, token });
 });
 
@@ -40,5 +40,23 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError(`Incorrect email or password`, 401));
   }
   const token = signToken(user.username, user.email);
+  res.cookie('jwt', token, { maxAge: 30 * 60 * 1000 });
   res.status(200).json({ status: 'ok', user, token });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1) Check for cookie with jwt
+  if (!req.cookies) next(new AppError('Your are not logged in', 400));
+  // 2) Find user with credentials
+  const { username } = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
+  const user = await databaseActions.selectEntry(
+    'select',
+    'users',
+    'username',
+    username
+  );
+  if (!user)
+    next(new AppError('You have been logged out. Please try again later'));
+  req.user = user;
+  next();
 });
