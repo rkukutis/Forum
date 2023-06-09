@@ -1,11 +1,5 @@
 const catchAsync = require('../utils/catchAsync');
-const {
-  insertData,
-  getAllData,
-  selectEntry,
-  deleteAllData,
-  updateEntry,
-} = require('./databaseActions');
+const databaseActions = require('../database/databaseActions');
 
 exports.createPost = catchAsync(async (req, res, next) => {
   const post = {
@@ -13,34 +7,39 @@ exports.createPost = catchAsync(async (req, res, next) => {
     body: req.body,
     user_id: req.user.id,
   };
-  await insertData(req.body, 'posts');
+  await databaseActions.insertData(req.body, 'posts');
   res.status(200).json({ status: 'success', data: post });
 });
 
 exports.getAllPosts = catchAsync(async (req, res, next) => {
-  const data = await getAllData('posts', req.params);
+  const data = await databaseActions.getAllData('posts', req.params);
   res.status(200).json({ status: 'success', data });
 });
 
 exports.getPost = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-  const user = await selectEntry('select', 'posts', 'id', userId);
+  const user = await databaseActions.selectEntry(
+    'select',
+    'posts',
+    'id',
+    userId
+  );
   res.status(200).json({ status: 'success', data: user });
 });
 
 exports.deleteAllPosts = catchAsync(async (req, res, next) => {
-  deleteAllData('posts');
+  databaseActions.deleteAllData('posts');
   res.status(204).json({ status: 'success' });
 });
 exports.deletePost = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-  await selectEntry('delete', 'posts', 'id', userId);
+  await databaseActions.selectEntry('delete', 'posts', 'id', userId);
   res.status(204).json({ status: 'success' });
 });
 
 exports.updatePost = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-  await updateEntry('posts', req.body, 'id', userId);
+  await databaseActions.updateEntry('posts', req.body, 'id', userId);
   // await db.none('UPDATE users SET active = $1 WHERE id = $2', [true, 123]);
   res.status(200).json({ status: 'success' });
 });

@@ -28,9 +28,9 @@ app.get('/', (req, res) => {
 app.use('/users', userRoutes);
 app.use('/posts', postRoutes);
 
-app.get('*', (req, res) => {
-  res.end();
-});
+// app.get('*', (req, res) => {
+//   res.end();
+// });
 
 app.use(globalErrorHandler);
 

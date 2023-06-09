@@ -14,6 +14,7 @@ CREATE TABLE "users" (
   "username" varchar NOT NULL UNIQUE,
   "email" VARCHAR NOT NULL UNIQUE,
   "password"  varchar NOT NULL,
+  "passwordChanged" TIMESTAMP,
   "role" role NOT NULL DEFAULT('user'),
   "status" status DEFAULT('active'),
   "created_at" TIMESTAMP NOT NULL DEFAULT(NOW())
