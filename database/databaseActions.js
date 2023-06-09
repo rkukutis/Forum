@@ -69,8 +69,8 @@ exports.updateEntry = async (table, data, column, value) => {
       data.password = await passwordHash.hashPassword(data.password);
     const pairs = Object.entries(data);
     const setString = pairs.map((el) => `${el[0]}='${el[1]}'`).join(', ');
-    const queryString = `UPDATE ${table} SET ${setString} WHERE ${column}= ${value};`;
-    await db.none(queryString);
+    const queryString = `UPDATE ${table} SET ${setString} WHERE ${column}= ${value} RETURNING *;`;
+    return await db.any(queryString);
   } catch (error) {
     throw new AppError(error, 500);
   }

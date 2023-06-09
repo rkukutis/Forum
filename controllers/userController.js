@@ -37,7 +37,12 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
 exports.updateUser = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-  await databaseActions.updateEntry('users', req.body, 'id', userId);
+  const updatedUser = await databaseActions.updateEntry(
+    'users',
+    req.body,
+    'id',
+    userId
+  );
   // await db.none('UPDATE users SET active = $1 WHERE id = $2', [true, 123]);
-  res.status(200).json({ status: 'success' });
+  res.status(200).json({ status: 'success', user: updatedUser });
 });
