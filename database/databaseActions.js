@@ -6,6 +6,7 @@ const AppError = require('../utils/appError');
 
 exports.insertData = async (data, table) => {
   try {
+    console.log(data, table);
     // hash password if present
     if (data.password)
       data.password = await passwordHash.hashPassword(data.password);
@@ -74,4 +75,9 @@ exports.updateEntry = async (table, data, column, value) => {
   } catch (error) {
     throw new AppError(error, 500);
   }
+};
+
+exports.resetSchema = async () => {
+  db.none('DROP SCHEMA IF EXISTS public CASCADE;');
+  db.none('CREATE SCHEMA public');
 };
