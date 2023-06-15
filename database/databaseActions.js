@@ -1,3 +1,4 @@
+const omit = require('lodash.omit');
 const db = require('./databaseConnect');
 const passwordHash = require('../utils/passwordHash');
 const AppError = require('../utils/appError');
@@ -6,7 +7,7 @@ const AppError = require('../utils/appError');
 
 exports.insertData = async (data, table) => {
   try {
-    console.log(data, table);
+    // console.log(data, table);
     // hash password if present
     if (data.password)
       data.password = await passwordHash.hashPassword(data.password);
@@ -33,6 +34,7 @@ exports.deleteAllData = async (table) => {
 exports.getAllData = async (table, query) => {
   try {
     const features = [];
+    // If there is a sort parameter, add ORDER By string
     if ('sort' in query) {
       const sortDirection = query.sort.startsWith('-') ? 'DESC' : 'ASC';
       features.push(
@@ -41,11 +43,49 @@ exports.getAllData = async (table, query) => {
         )} ${sortDirection}`
       );
     }
+    // If there is a limit and page parameter, return paginated results
     if ('limit' in query) features.push(`LIMIT ${query.limit}`);
     if ('page' in query)
       features.push(`OFFSET ${(query.page - 1) * query.limit}`);
+    // Combine all feature substrings
     const featuresString = features.join(' ');
-    return await db.any(`SELECT * FROM ${table} ${featuresString}`);
+
+    // Return all user details (only for admin use)
+    const data = db.any(`SELECT * FROM ${table} ${featuresString}`);
+    if (table === 'users') return await data;
+
+    // If the requested rows are for comments, posts or announcements
+    const promiseArray = await data.then(
+      // each post comment, post or announcement has an author
+      async (rows) =>
+        await rows.map(async (row) => {
+          // remove password from user info
+          const user = omit(
+            await db.one(`SELECT * FROM users WHERE id = $1`, [row.user_id]),
+            ['password']
+          );
+          // Each post or announcement has an array of comments
+          const commentsArray =
+            table !== 'comments' &&
+            (await db.any(`SELECT * FROM comments WHERE post_id = $1`, [
+              row.id,
+            ]));
+
+          const populatedComments = await Promise.all(
+            commentsArray.map(async (comment) => {
+              const commentAuthor = await db.one(
+                `SELECT * FROM users WHERE id = $1`,
+                [comment.user_id]
+              );
+              return Object.assign(comment, { author: commentAuthor.username });
+            })
+          );
+
+          return Object.assign(row, { user }, { comments: populatedComments });
+        })
+    );
+
+    return await Promise.all(promiseArray);
   } catch (error) {
     throw new AppError(error, 500);
   }

@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const userRoutes = require('./routes/userRoutes');
 const postRoutes = require('./routes/postRoutes');
@@ -19,6 +20,7 @@ app.use(cookieParser());
 
 /////////////////////////////////////////////////////////
 
+app.use(cors());
 // Routing
 app.get('/', (req, res) => {
   res.status(200).send('Hello from root');

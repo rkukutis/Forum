@@ -12,7 +12,8 @@ exports.createPost = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllPosts = catchAsync(async (req, res, next) => {
-  const data = await databaseActions.getAllData('posts', req.params);
+  console.log(req.query);
+  const data = await databaseActions.getAllData('posts', req.query);
   res.status(200).json({ status: 'success', data });
 });
 
