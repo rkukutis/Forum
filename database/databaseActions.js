@@ -7,7 +7,7 @@ const AppError = require('../utils/appError');
 
 exports.insertData = async (data, table) => {
   try {
-    // console.log(data, table);
+    console.log(data, table);
     // hash password if present
     if (data.password)
       data.password = await passwordHash.hashPassword(data.password);
@@ -15,8 +15,8 @@ exports.insertData = async (data, table) => {
     const keys = pairs.map((el) => `${el[0]}`).join(', ');
     const vars = pairs.map((el, i) => `$${i + 1}`).join(', ');
     const values = pairs.map((el) => `${el[1]}`);
-    const queryString = `INSERT INTO ${table}(${keys}) VALUES(${vars})`;
-    await db.none(queryString, values);
+    const queryString = `INSERT INTO ${table}(${keys}) VALUES(${vars}) RETURNING *`;
+    return await db.any(queryString, values);
   } catch (error) {
     throw new AppError(error, 500);
   }
@@ -58,30 +58,32 @@ exports.getAllData = async (table, query) => {
     const promiseArray = await data.then(
       // each post comment, post or announcement has an author
       async (rows) =>
-        await rows.map(async (row) => {
+        rows.map(async (row) => {
           // remove password from user info
           const user = omit(
             await db.one(`SELECT * FROM users WHERE id = $1`, [row.user_id]),
             ['password']
           );
-          // Each post or announcement has an array of comments
-          const commentsArray =
-            table !== 'comments' &&
-            (await db.any(`SELECT * FROM comments WHERE post_id = $1`, [
-              row.id,
-            ]));
 
-          const populatedComments = await Promise.all(
-            commentsArray.map(async (comment) => {
-              const commentAuthor = await db.one(
-                `SELECT * FROM users WHERE id = $1`,
-                [comment.user_id]
-              );
-              return Object.assign(comment, { author: commentAuthor.username });
-            })
-          );
+          // const commentsArray =
+          //   table !== 'comments' &&
+          //   (await db.any(`SELECT * FROM comments WHERE post_id = $1`, [
+          //     row.id,
+          //   ]));
 
-          return Object.assign(row, { user }, { comments: populatedComments });
+          // const populatedComments = await Promise.all(
+          //   commentsArray.map(async (comment) => {
+          //     const commentAuthor = await db.one(
+          //       `SELECT * FROM users WHERE id = $1`,
+          //       [comment.user_id]
+          //     );
+          //     return Object.assign(comment, { author: commentAuthor.username });
+          //   })
+          // );
+
+          // return Object.assign(row, { user }, { comments: populatedComments });
+          // ^^^ Dont display comments for post previews
+          return Object.assign(row, { user });
         })
     );
 
@@ -91,8 +93,54 @@ exports.getAllData = async (table, query) => {
   }
 };
 
-exports.selectEntry = async (action, table, column, value) => {
+exports.selectPost = async (action, table, column, value) => {
   try {
+    // Initial query (query 1)
+    const post = await db.oneOrNone(
+      `${action.toUpperCase()} ${
+        action === 'delete' ? '' : '*'
+      } FROM ${table} WHERE ${column} = $1`,
+      [value]
+    );
+
+    // Throw error if post not found
+    if (!post) throw new AppError('Post not found', 404);
+
+    // get post author details and remove password (query 2)
+    const postAuthor = omit(
+      await db.one(`SELECT * FROM users WHERE id = $1`, [post.user_id]),
+      ['password', 'password_changed']
+    );
+    // get post comments (query 3)
+    const postComments = await db.any(
+      'SELECT * FROM comments WHERE post_id = $1',
+      [post.id]
+    );
+    // get comment author details (query n+2)
+    const populatedComments = await Promise.all(
+      postComments.map(async (comment) => {
+        const commentAuthor = await db.one(
+          `SELECT * FROM users WHERE id = $1`,
+          [comment.user_id]
+        );
+        return Object.assign(comment, { author: commentAuthor.username });
+      })
+    );
+
+    // combine and return post, author and comments
+    return Object.assign(
+      post,
+      { author: postAuthor },
+      { comments: populatedComments }
+    );
+  } catch (error) {
+    throw new AppError(error, 500);
+  }
+};
+
+exports.selectUser = async (action, table, column, value) => {
+  try {
+    // Initial query (query 1)
     return await db.oneOrNone(
       `${action.toUpperCase()} ${
         action === 'delete' ? '' : '*'
@@ -118,6 +166,6 @@ exports.updateEntry = async (table, data, column, value) => {
 };
 
 exports.resetSchema = async () => {
-  db.none('DROP SCHEMA IF EXISTS public CASCADE;');
-  db.none('CREATE SCHEMA public');
+  await db.none('DROP SCHEMA IF EXISTS public CASCADE;');
+  await db.none('CREATE SCHEMA IF NOT EXISTS public AUTHORIZATION postgres');
 };

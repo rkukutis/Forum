@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { insertData, resetSchema } = require('../../database/databaseActions');
+const slugify = require('slugify');
 
 const readFiles = (data) => {
   const dataObject = {};
@@ -10,18 +11,23 @@ const readFiles = (data) => {
   return dataObject;
 };
 
-const importUsers = (data) => {
+const importData = (data) => {
   // receives array of table names
   data.forEach((table) =>
-    readFiles(data)[table].forEach(async (el) => insertData(el, `${table}`))
+    readFiles(data)[table].forEach(async (el) => {
+      // const importData;
+      let importedData = el;
+      if (table === 'posts' || table === 'announcements')
+        importedData = Object.assign(el, { slug: slugify(`${el.title}`) });
+      await insertData(importedData, `${table}`);
+    })
   );
 };
 
-// // importUsers(['users']);
-// // importUsers(['posts']);
-// // importUsers(['comments']);
-// importUsers(['announcements']);
-
+// importData(['users']);
+// importData(['posts']);
+// importData(['comments']);
+// importData(['announcements']);
 // resetSchema();
 
 //

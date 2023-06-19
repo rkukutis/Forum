@@ -1,25 +1,29 @@
+const slugify = require('slugify');
 const catchAsync = require('../utils/catchAsync');
 const databaseActions = require('../database/databaseActions');
 
 exports.createPost = catchAsync(async (req, res, next) => {
+  // req.body.slug = slugify(req.body.title) || 'defaultSlug';
   const post = {
-    title: req.title,
-    body: req.body,
+    title: req.body.title,
+    slug: slugify(req.body.title),
+    body: req.body.body,
     user_id: req.user.id,
   };
-  await databaseActions.insertData(req.body, 'posts');
-  res.status(200).json({ status: 'success', data: post });
+
+  const createdPost = await databaseActions.insertData(post, 'posts');
+  res.status(200).json({ status: 'success', data: createdPost });
 });
 
 exports.getAllPosts = catchAsync(async (req, res, next) => {
-  console.log(req.query);
+  // console.log(req.query);
   const data = await databaseActions.getAllData('posts', req.query);
   res.status(200).json({ status: 'success', data });
 });
 
 exports.getPost = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-  const user = await databaseActions.selectEntry(
+  const user = await databaseActions.selectPost(
     'select',
     'posts',
     'id',

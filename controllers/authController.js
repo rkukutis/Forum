@@ -26,7 +26,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 2) Check if user exists and password is correct
-  const user = await databaseActions.selectEntry(
+  const user = await databaseActions.selectUser(
     'select',
     'users',
     'email',
@@ -58,7 +58,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (!token) return next(new AppError('Your are not logged in', 400));
   // 2) Find user with credentials
   const { username } = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
-  const user = await databaseActions.selectEntry(
+  const user = await databaseActions.selectUser(
     'select',
     'users',
     'username',
