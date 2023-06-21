@@ -16,11 +16,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Serve files from public page
-// app.use(express.static(`${__dirname}/public`));
 
 /////////////////////////////////////////////////////////
 
 app.use(cors());
+app.use('/userPhotos', express.static(`${__dirname}/img/users`));
 // Routing
 app.get('/', (req, res) => {
   res.status(200).send('Hello from root');
