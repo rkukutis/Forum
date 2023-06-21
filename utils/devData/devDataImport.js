@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { insertData, resetSchema } = require('../../database/databaseActions');
 const slugify = require('slugify');
+const db = require('../../database/databaseConnect');
 
 const readFiles = (data) => {
   const dataObject = {};
@@ -20,6 +21,9 @@ const importData = (data) => {
       if (table === 'posts' || table === 'announcements')
         importedData = Object.assign(el, { slug: slugify(`${el.title}`) });
       await insertData(importedData, `${table}`);
+      await db.none(
+        `SELECT setval('${table}_id_seq', (SELECT MAX(id) FROM public.${table})+1);`
+      );
     })
   );
 };

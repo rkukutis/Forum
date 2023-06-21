@@ -16,7 +16,7 @@ exports.getDataUsers = catchAsync(async (req, res, next) => {
 
 exports.getUserData = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-  const user = await databaseActions.selectEntry(
+  const user = await databaseActions.selectUser(
     'select',
     'users',
     'id',

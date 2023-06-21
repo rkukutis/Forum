@@ -16,6 +16,7 @@ exports.insertData = async (data, table) => {
     const vars = pairs.map((el, i) => `$${i + 1}`).join(', ');
     const values = pairs.map((el) => `${el[1]}`);
     const queryString = `INSERT INTO ${table}(${keys}) VALUES(${vars}) RETURNING *`;
+    console.log(queryString, values);
     return await db.any(queryString, values);
   } catch (error) {
     throw new AppError(error, 500);

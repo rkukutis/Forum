@@ -9,10 +9,13 @@ const signToken = (username, email) =>
 
 exports.createUser = catchAsync(async (req, res, next) => {
   // 1) Get user data from request body
-  const { username, email } = req.body;
+  const { username, email, password } = req.body;
   // 2) Create token
   const token = signToken(username, email);
-  const data = await databaseActions.insertData(req.body, 'users');
+  const data = await databaseActions.insertData(
+    { username, email, password },
+    'users'
+  );
   res.cookie('jwt', token, { maxAge: 30 * 60 * 1000 });
   res.status(200).json({ status: 'success', data, token });
 });
@@ -76,6 +79,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 exports.restrictTo =
   (...roles) =>
   (req, res, next) => {
+    console.log(roles);
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError(`You do not have permission to perform this action`, 403)
