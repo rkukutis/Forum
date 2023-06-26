@@ -22,14 +22,14 @@ exports.getAllPosts = catchAsync(async (req, res, next) => {
 });
 
 exports.getPost = catchAsync(async (req, res, next) => {
-  const userId = req.params.id;
-  const user = await databaseActions.selectPost(
+  const postId = req.params.id;
+  const post = await databaseActions.selectPost(
     'select',
     'posts',
     'id',
-    userId
+    postId
   );
-  res.status(200).json({ status: 'success', data: user });
+  res.status(200).json({ status: 'success', data: post });
 });
 
 exports.deleteAllPosts = catchAsync(async (req, res, next) => {
