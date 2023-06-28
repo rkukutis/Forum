@@ -5,6 +5,7 @@ const cors = require('cors');
 
 const userRoutes = require('./routes/userRoutes');
 const postRoutes = require('./routes/postRoutes');
+const authRoutes = require('./routes/authRoutes');
 const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
@@ -27,6 +28,7 @@ app.get('/', (req, res) => {
 });
 
 // Mounting routers
+app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/posts', postRoutes);
 

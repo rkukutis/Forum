@@ -1,5 +1,6 @@
 const catchAsync = require('../utils/catchAsync');
 const databaseActions = require('../database/databaseActions');
+const AppError = require('../utils/appError');
 
 /////////////////////////////////////////////////////////////////
 
@@ -37,6 +38,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
 exports.updateUser = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
+  console.log(req.file);
   const updatedUser = await databaseActions.updateEntry(
     'users',
     req.body,

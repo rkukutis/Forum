@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+
 const AppError = require('../utils/appError');
 const databaseActions = require('../database/databaseActions');
 const passwordHash = require('../utils/passwordHash');
@@ -76,7 +77,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.restrictTo =
+exports.restrictToRole =
   (...roles) =>
   (req, res, next) => {
     console.log(roles);
@@ -87,3 +88,19 @@ exports.restrictTo =
     }
     next();
   };
+
+exports.restrictToAccountOwner = catchAsync(async (req, res, next) => {
+  const updatedUser = await databaseActions.selectUser(
+    'select',
+    'users',
+    'id',
+    req.user.id
+  );
+  console.log(updatedUser, req.user);
+  if (!updatedUser || updatedUser.id !== req.user.id)
+    return next(
+      new AppError('Only the owner of this account can make changes')
+    );
+
+  next();
+});
