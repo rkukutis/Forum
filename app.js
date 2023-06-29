@@ -19,8 +19,27 @@ app.use(cookieParser());
 // Serve files from public page
 
 /////////////////////////////////////////////////////////
+// const corsOptions = {
+//   // origin:'https://abc.onrender.com',
+//   AccessControlAllowOrigin: '*',
+//   origin: '*',
+//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+// };
+// app.options(cors(corsOptions));
+
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST');
+//   res.header(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept'
+//   );
+//   next();
+// });
 
 app.use(cors());
+
+app.use(express.static('./client/build'));
 app.use('/userPhotos', express.static(`${__dirname}/img/users`));
 // Routing
 app.get('/', (req, res) => {
@@ -31,10 +50,6 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/posts', postRoutes);
-
-// app.get('*', (req, res) => {
-//   res.end();
-// });
 
 app.use(globalErrorHandler);
 

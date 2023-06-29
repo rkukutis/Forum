@@ -32,7 +32,7 @@ exports.deleteAllUsers = catchAsync(async (req, res, next) => {
 });
 exports.deleteUser = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-  await databaseActions.selectEntry('delete', 'users', 'id', userId);
+  await databaseActions.selectUser('delete', 'users', 'id', userId);
   res.status(204).json({ status: 'success' });
 });
 

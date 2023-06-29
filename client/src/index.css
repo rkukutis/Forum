@@ -1,0 +1,58 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Lato", sans-serif;
+}
+
+.app {
+  width: 100vw;
+  background: #ebffe1; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to left,
+    #78ffd6,
+    #d3ffbc
+  ); /* Chrome 10-25, Safari 5.1-6 */
+}
+
+.button {
+  width: 10rem;
+  height: 2rem;
+
+  color: white;
+  background-color: rgb(141, 164, 77);
+  border-style: none;
+  border-radius: 1rem;
+}
+
+header {
+  height: 15vh;
+  background-color: rgba(197, 255, 207, 0.825);
+}
+
+header.nav {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.post-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.post-preview {
+  padding: 1rem;
+  margin: 1rem;
+  display: flex;
+  background-color: rgb(218, 236, 255);
+  background-color: rgba(0, 0, 0, 0.071);
+  border-radius: 1rem;
+}
+
+footer {
+  height: 15vh;
+  background-color: rgba(81, 81, 81, 0.825);
+}

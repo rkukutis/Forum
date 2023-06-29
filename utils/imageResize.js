@@ -22,7 +22,7 @@ const filter = function (file, cb) {
 exports.upload = multer({
   storage,
   limits: { fileSize: 10000000 },
-  fileFilter: (file, cb) => {
+  fileFilter: (req, file, cb) => {
     filter(file, cb);
   },
 });

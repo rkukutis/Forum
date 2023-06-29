@@ -153,6 +153,20 @@ exports.selectUser = async (action, table, column, value) => {
   }
 };
 
+exports.selectUser = async (action, table, column, value) => {
+  try {
+    // Initial query (query 1)
+    return await db.oneOrNone(
+      `${action.toUpperCase()} ${
+        action === 'delete' ? '' : '*'
+      } FROM ${table} WHERE ${column} = $1`,
+      [value]
+    );
+  } catch (error) {
+    throw new AppError(error, 500);
+  }
+};
+
 exports.updateEntry = async (table, data, column, value) => {
   try {
     if (data.password)
