@@ -3,6 +3,7 @@ const databaseActions = require('../database/databaseActions');
 const AppError = require('../utils/appError');
 
 /////////////////////////////////////////////////////////////////
+// Most of these functions are for admin use, i'll maybe delete some later
 
 exports.createUser = catchAsync(async (req, res, next) => {
   const data = await databaseActions.insertData(req.body, 'users');

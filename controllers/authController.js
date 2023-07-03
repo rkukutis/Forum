@@ -10,6 +10,7 @@ const signToken = (username, email) =>
 
 exports.createUser = catchAsync(async (req, res, next) => {
   // 1) Get user data from request body
+  //TO DO: sanitize user input
   const { username, email, password } = req.body;
   // 2) Create token
   const token = signToken(username, email);
