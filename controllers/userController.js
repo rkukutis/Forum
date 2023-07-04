@@ -6,9 +6,9 @@ const AppError = require('../utils/appError');
 // Most of these functions are for admin use, i'll maybe delete some later
 
 exports.createUser = catchAsync(async (req, res, next) => {
-  const data = await databaseActions.insertData(req.body, 'users');
-  console.log(data);
-  res.status(200).json({ status: 'success', data: req.body });
+  const [user] = await databaseActions.insertData(req.body, 'users');
+  if (!user) return next(new AppError('User creation unsuuccessful', 500));
+  res.status(200).json({ status: 'success', data: user });
 });
 
 exports.getDataUsers = catchAsync(async (req, res, next) => {
@@ -18,7 +18,7 @@ exports.getDataUsers = catchAsync(async (req, res, next) => {
 
 exports.getUserData = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-  const user = await databaseActions.selectUser(
+  const [user] = await databaseActions.selectUser(
     'select',
     'users',
     'id',
@@ -39,7 +39,6 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
 exports.updateUser = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-  console.log(req.file);
   const updatedUser = await databaseActions.updateEntry(
     'users',
     req.body,
