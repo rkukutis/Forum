@@ -1,12 +1,18 @@
-const sendErrorDev = (err, req, res) =>
-  // if (req.originalUrl.startsWith('/api'))
-  // send json error if accessed via API
+function sendErrorDev(err, req, res) {
   res.status(err.statusCode).json({
     status: err.status,
     error: err,
     message: err.message,
     stack: err.stack,
   });
+}
+
+function sendErrorProd(err, req, res) {
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
+  });
+}
 
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
@@ -15,6 +21,6 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
-    // sendErrorProd(error, req, res);
+    sendErrorProd(err, req, res);
   }
 };

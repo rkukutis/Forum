@@ -119,10 +119,10 @@ exports.selectPost = async (action, table, column, value) => {
     const populatedComments = await Promise.all(
       postComments.map(async (comment) => {
         const commentAuthor = await db.one(
-          `SELECT * FROM users WHERE id = $1`,
+          `SELECT id, username, status, role, created_at FROM users WHERE id = $1`,
           [comment.user_id]
         );
-        return Object.assign(comment, { author: commentAuthor.username });
+        return Object.assign(comment, { author: commentAuthor });
       })
     );
 

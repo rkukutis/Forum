@@ -1,6 +1,6 @@
 const fs = require('fs');
-const { insertData, resetSchema } = require('../../database/databaseActions');
 const slugify = require('slugify');
+const { insertData, resetSchema } = require('../../database/databaseActions');
 const db = require('../../database/databaseConnect');
 
 const readFiles = (data) => {

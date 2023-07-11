@@ -9,12 +9,11 @@ const authRoutes = require('./routes/authRoutes');
 const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
+app.use(cookieParser());
 
 // enable logging if in development mode
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 app.use(express.json());
-
-app.use(cookieParser());
 
 // Serve files from public page
 
@@ -37,7 +36,7 @@ app.use(cookieParser());
 //   next();
 // });
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 
 app.use(express.static('./client/build'));
 app.use('/userPhotos', express.static(`${__dirname}/img/users`));

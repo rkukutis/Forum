@@ -1,17 +1,33 @@
 * {
   margin: 0;
   padding: 0;
-  font-family: "Lato", sans-serif;
+  font-family: 'Lato', sans-serif;
 }
 
 .app {
+  height: 100vh;
   width: 100vw;
-  background: #ebffe1; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-    to left,
-    #78ffd6,
-    #d3ffbc
-  ); /* Chrome 10-25, Safari 5.1-6 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.box {
+  background-color: aqua;
+  height: 100px;
+  width: 200px;
+}
+
+.modal {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80vw;
+  height: 50vh;
+  background-color: #51be16;
+  border-radius: 2rem;
+  transform: translate(0, 20vh);
 }
 
 .button {
@@ -22,17 +38,6 @@
   background-color: rgb(141, 164, 77);
   border-style: none;
   border-radius: 1rem;
-}
-
-header {
-  height: 15vh;
-  background-color: rgba(197, 255, 207, 0.825);
-}
-
-header.nav {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .post-container {
@@ -53,6 +58,7 @@ header.nav {
 }
 
 footer {
-  height: 15vh;
+  display: grid;
+  width: 100vw;
   background-color: rgba(81, 81, 81, 0.825);
 }
