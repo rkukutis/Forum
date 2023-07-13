@@ -14,6 +14,7 @@ router
 // create comment on certain post
 router
   .route('/:id/comments')
+  .get(commentController.getComments)
   .post(authController.protect, commentController.createComment);
 
 router

@@ -39,7 +39,7 @@ export default function PostContainer() {
           </div>
 
           {/* If the post doesn't have any comments yet */}
-          {post.comments.length === 0 ? (
+          {[...post.comments].length === 0 ? (
             <h1>
               This post doesn't have any comments :(. You can start the
               conversation :)

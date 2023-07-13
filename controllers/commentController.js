@@ -14,3 +14,12 @@ exports.createComment = catchAsync(async (req, res, next) => {
   const createdComment = await databaseActions.insertData(comment, 'comments');
   res.status(200).json({ status: 'success', data: createdComment });
 });
+
+exports.getComments = catchAsync(async (req, res, next) => {
+  console.log(req.params.id, req.query);
+  const comments = await databaseActions.selectComments(
+    req.params.id,
+    req.query
+  );
+  res.status(200).json({ status: 'success', data: comments });
+});

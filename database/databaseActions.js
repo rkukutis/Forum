@@ -30,27 +30,31 @@ exports.deleteAllData = async (table) => {
   }
 };
 
+function buildFeatureString(query) {
+  const features = [];
+  // If there is a sort parameter, add ORDER By string
+  if ('sort' in query) {
+    const sortDirection = query.sort.startsWith('-') ? 'DESC' : 'ASC';
+    features.push(
+      `ORDER BY ${query.sort.slice(
+        sortDirection === 'DESC' ? 1 : 0
+      )} ${sortDirection}`
+    );
+  }
+  // If there is a limit and page parameter, return paginated results
+  if ('limit' in query) features.push(`LIMIT ${query.limit}`);
+  if ('page' in query)
+    features.push(`OFFSET ${(query.page - 1) * query.limit}`);
+  // Combine all feature substrings
+  return features.join(' ');
+}
+
 exports.getAllData = async (table, query) => {
   try {
-    const features = [];
-    // If there is a sort parameter, add ORDER By string
-    if ('sort' in query) {
-      const sortDirection = query.sort.startsWith('-') ? 'DESC' : 'ASC';
-      features.push(
-        `ORDER BY ${query.sort.slice(
-          sortDirection === 'DESC' ? 1 : 0
-        )} ${sortDirection}`
-      );
-    }
-    // If there is a limit and page parameter, return paginated results
-    if ('limit' in query) features.push(`LIMIT ${query.limit}`);
-    if ('page' in query)
-      features.push(`OFFSET ${(query.page - 1) * query.limit}`);
-    // Combine all feature substrings
-    const featuresString = features.join(' ');
+    const featureString = buildFeatureString(query);
 
     // Return all user details (only for admin use)
-    const data = db.any(`SELECT * FROM ${table} ${featuresString}`);
+    const data = db.any(`SELECT * FROM ${table} ${featureString}`);
     if (table === 'users') return await data;
 
     // If the requested rows are for comments, posts or announcements
@@ -92,9 +96,11 @@ exports.getAllData = async (table, query) => {
   }
 };
 
+// Returns post data with author info
 exports.selectPost = async (action, table, column, value) => {
   try {
     // Initial query (query 1)
+    console.log(action, table, column, value);
     const post = await db.oneOrNone(
       `${action.toUpperCase()} ${
         action === 'delete' ? '' : '*'
@@ -110,31 +116,39 @@ exports.selectPost = async (action, table, column, value) => {
       await db.one(`SELECT * FROM users WHERE id = $1`, [post.user_id]),
       ['password', 'password_changed']
     );
-    // get post comments (query 3)
-    const postComments = await db.any(
-      'SELECT * FROM comments WHERE post_id = $1',
-      [post.id]
-    );
-    // get comment author details (query n+2)
-    const populatedComments = await Promise.all(
-      postComments.map(async (comment) => {
-        const commentAuthor = await db.one(
-          `SELECT id, username, status, role, created_at FROM users WHERE id = $1`,
-          [comment.user_id]
-        );
-        return Object.assign(comment, { author: commentAuthor });
-      })
-    );
+
+    // TODO:  Comments should be fetched seperately
 
     // combine and return post, author and comments
     return Object.assign(
       post,
-      { author: postAuthor },
-      { comments: populatedComments }
+      { author: postAuthor }
+      // { comments: populatedComments }
     );
   } catch (error) {
     throw new AppError(error, 500);
   }
+};
+
+exports.selectComments = async (postId, query) => {
+  const featuresString = buildFeatureString(query);
+  // get post comments
+  const comments = await db.any(
+    `SELECT * FROM comments WHERE post_id = $1 ${featuresString}`,
+    postId
+  );
+  // get comment author details
+  const populatedComments = await Promise.all(
+    comments.map(async (comment) => {
+      const commentAuthor = await db.one(
+        `SELECT id, username, image, status, role, created_at FROM users WHERE id = $1`,
+        [comment.user_id]
+      );
+      return Object.assign(comment, { author: commentAuthor });
+    })
+  );
+
+  return populatedComments;
 };
 
 exports.selectUser = async (action, table, column, value) => {
