@@ -3,14 +3,21 @@ import Modal from './Modal';
 import Footer from './Footer';
 import LoginRegisterForm from './LoginRegisterForm';
 import PostContainer from './Post';
+import Author from './Author';
 
 function Navbar({ children }) {
   return <nav>{children}</nav>;
 }
 
-function Header({ onLinkClick }) {
+function Header({ onLinkClick, loggedinUser }) {
   return (
     <header>
+      {loggedinUser && (
+        <>
+          <h2>Logged in as</h2>
+          <Author author={loggedinUser} />
+        </>
+      )}
       <Navbar>
         <Button onclick={onLinkClick}>Log in | Register</Button>
       </Navbar>
@@ -26,9 +33,9 @@ function Button({ children, onclick, color = 'rgb(87, 237, 112)' }) {
   );
 }
 
-function PostPreview({ author, title, date, postSnippet }) {
+function PostPreview({ id, author, title, date, postSnippet, onSelectPost }) {
   return (
-    <div className="post-preview">
+    <div onClick={() => onSelectPost(id)} className="post-preview">
       <div
         style={{
           display: 'flex',
@@ -36,21 +43,7 @@ function PostPreview({ author, title, date, postSnippet }) {
           borderRadius: '10px',
         }}
       >
-        <div style={{ margin: '10px' }}>
-          <img
-            alt={`${author.username}`}
-            style={{
-              width: '50px',
-              borderWidth: '5px',
-              borderColor: author.role === 'admin' ? 'crimson' : 'teal',
-              borderStyle: 'solid',
-              borderRadius: '5rem',
-            }}
-            // 192.168.1.203 is the adress of the desktop pc
-            src={`http://192.168.1.203:8000}/userPhotos/user_${author.id}.jpg`}
-          />
-          <h4>{author.username}</h4>
-        </div>
+        <Author author={author} />
         <div>
           <h3>{title}</h3>
           <p>{postSnippet}</p>
@@ -75,7 +68,7 @@ function ErrorMessage({ errorMessage }) {
 function Loading() {
   return <p>Loading....</p>;
 }
-function PostPreviewContainer() {
+function PostPreviewContainer({ onSelectPost }) {
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [error, setError] = useState('');
@@ -131,10 +124,12 @@ function PostPreviewContainer() {
         posts.map((post) => (
           <PostPreview
             key={post.id}
+            id={post.id}
             author={post.user}
             postSnippet={post.body.split(' ').slice(0, 15).join(' ') + '...'}
             title={post.title}
             date={post.created_at}
+            onSelectPost={onSelectPost}
           ></PostPreview>
         ))}
       {error && <ErrorMessage errorMessage={error} />}
@@ -149,7 +144,8 @@ function Box() {
 export default function App() {
   const [modalIsActive, setModalIsActive] = useState(false);
   const [selectedLink, setSelectedLink] = useState('');
-  const [mainContent, setMainContent] = useState('posts');
+  const [loggedinUser, setLoggedinUser] = useState(null);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   function handleToggleModal(e) {
     setModalIsActive((c) => !c);
@@ -173,25 +169,22 @@ export default function App() {
       body: JSON.stringify(post),
     });
     const data = await res.json();
-    console.log(data);
   }
 
   return (
     <div className="app">
       {modalIsActive && (
         <Modal>
-          <LoginRegisterForm />
+          <LoginRegisterForm onLogin={setLoggedinUser} />
         </Modal>
       )}
-      <Header onLinkClick={handleToggleModal} />
+      <Header onLinkClick={handleToggleModal} loggedinUser={loggedinUser} />
       <Button onclick={handleCreatePost}>Make a post</Button>
-      {/* {mainContent === 'posts' ? (
-        <PostPreviewContainer />
+      {!selectedPost ? (
+        <PostPreviewContainer onSelectPost={setSelectedPost} />
       ) : (
-        <h1>Announcements</h1>
-      )} */}
-      <PostContainer />
-
+        <PostContainer postId={selectedPost} onSelectPost={setSelectedPost} />
+      )}
       <Footer />
     </div>
   );

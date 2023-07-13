@@ -40,6 +40,25 @@
   border-radius: 1rem;
 }
 
+/* width: '50px',
+
+    borderRadius: '5rem',
+ */
+
+.author-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 0 1vw 0 1vw;
+  width: 150px;
+}
+
+.author-info > img {
+  width: 80px;
+  border-radius: 3rem;
+}
+
 .post-container {
   width: 100%;
   display: flex;

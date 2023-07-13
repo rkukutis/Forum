@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function LoginRegisterForm() {
+export default function LoginRegisterForm({ onLogin }) {
   const [error, setError] = useState(null);
   const [action, setAction] = useState('login');
   const [username, setUsername] = useState('');
@@ -35,9 +35,7 @@ export default function LoginRegisterForm() {
   };
 
   const registerLoginUser = async (obj) => {
-    console.log(obj);
-
-    await fetch(
+    const res = await fetch(
       `http://localhost:8000/auth/${action === 'login' ? 'login' : 'signup'}`,
       {
         method: 'POST',
@@ -49,9 +47,9 @@ export default function LoginRegisterForm() {
         },
         body: JSON.stringify(obj),
       }
-    ).then((res) =>
-      res.json().then((data) => data.error && setError(data.message))
     );
+    const data = await res.json();
+    if (!data.error) onLogin(data.user);
   };
 
   return (

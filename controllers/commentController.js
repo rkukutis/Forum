@@ -16,7 +16,6 @@ exports.createComment = catchAsync(async (req, res, next) => {
 });
 
 exports.getComments = catchAsync(async (req, res, next) => {
-  console.log(req.params.id, req.query);
   const comments = await databaseActions.selectComments(
     req.params.id,
     req.query

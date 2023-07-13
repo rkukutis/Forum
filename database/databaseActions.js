@@ -100,7 +100,6 @@ exports.getAllData = async (table, query) => {
 exports.selectPost = async (action, table, column, value) => {
   try {
     // Initial query (query 1)
-    console.log(action, table, column, value);
     const post = await db.oneOrNone(
       `${action.toUpperCase()} ${
         action === 'delete' ? '' : '*'
@@ -133,6 +132,11 @@ exports.selectPost = async (action, table, column, value) => {
 exports.selectComments = async (postId, query) => {
   const featuresString = buildFeatureString(query);
   // get post comments
+  const numCommentsTotal = await db.oneOrNone(
+    'SELECT COUNT(post_id) FROM comments WHERE post_id = $1',
+    postId
+  );
+
   const comments = await db.any(
     `SELECT * FROM comments WHERE post_id = $1 ${featuresString}`,
     postId
@@ -148,7 +152,7 @@ exports.selectComments = async (postId, query) => {
     })
   );
 
-  return populatedComments;
+  return [numCommentsTotal, populatedComments];
 };
 
 exports.selectUser = async (action, table, column, value) => {
