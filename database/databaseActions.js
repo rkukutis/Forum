@@ -49,13 +49,17 @@ function buildFeatureString(query) {
   return features.join(' ');
 }
 
-exports.getAllData = async (table, query) => {
+exports.selectPosts = async (query) => {
   try {
     const featureString = buildFeatureString(query);
 
     // Return all user details (only for admin use)
-    const data = db.any(`SELECT * FROM ${table} ${featureString}`);
-    if (table === 'users') return await data;
+    const data = db.any(`SELECT * FROM posts ${featureString}`);
+
+    // Get number of total rows in table // pretty slow
+    const { count: totalNumRows } =
+      await db.oneOrNone(`SELECT COUNT(*) FROM posts;
+    `);
 
     // If the requested rows are for comments, posts or announcements
     const promiseArray = await data.then(
@@ -67,30 +71,15 @@ exports.getAllData = async (table, query) => {
             await db.one(`SELECT * FROM users WHERE id = $1`, [row.user_id]),
             ['password']
           );
-
-          // const commentsArray =
-          //   table !== 'comments' &&
-          //   (await db.any(`SELECT * FROM comments WHERE post_id = $1`, [
-          //     row.id,
-          //   ]));
-
-          // const populatedComments = await Promise.all(
-          //   commentsArray.map(async (comment) => {
-          //     const commentAuthor = await db.one(
-          //       `SELECT * FROM users WHERE id = $1`,
-          //       [comment.user_id]
-          //     );
-          //     return Object.assign(comment, { author: commentAuthor.username });
-          //   })
-          // );
-
-          // return Object.assign(row, { user }, { comments: populatedComments });
-          // ^^^ Dont display comments for post previews
-          return Object.assign(row, { user });
+          const { count: numComments } = await db.one(
+            `SELECT COUNT(*) FROM comments WHERE post_id = ${row.id}`
+          );
+          return Object.assign(row, { user, numComments });
         })
     );
 
-    return await Promise.all(promiseArray);
+    const posts = await Promise.all(promiseArray);
+    return [totalNumRows, posts];
   } catch (error) {
     throw new AppError(error, 500);
   }

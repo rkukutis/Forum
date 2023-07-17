@@ -64,7 +64,6 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
-  console.log(req.cookies);
   let token;
   // 1) get JWT
   if (

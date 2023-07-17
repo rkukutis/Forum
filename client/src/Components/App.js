@@ -1,9 +1,76 @@
 import { useState, useEffect } from 'react';
+import { formatDate } from '../utils';
 import Modal from './Modal';
 import Footer from './Footer';
 import LoginRegisterForm from './LoginRegisterForm';
 import PostContainer from './Post';
 import Author from './Author';
+import { SettingsTab } from './SettingsTab';
+
+function CreatePost({ type }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [error, setError] = useState('');
+
+  async function handleCreatePost() {
+    if (type === 'post' && (!body || !title))
+      return setError('Title or body empty');
+    if (type === 'comment' && !body) return setError('Comment body empty');
+
+    const res = await fetch(`http://192.168.1.203:8000/posts`, {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ title, body }),
+    });
+    const data = await res.json();
+    console.log(data);
+  }
+
+  function handleExpand() {
+    setIsExpanded(!isExpanded);
+  }
+
+  return (
+    <div className="create-post">
+      {!isExpanded && (
+        <button onClick={handleExpand}>
+          {type === 'post' ? 'Create a new post' : 'Add a comment'}
+        </button>
+      )}
+      {isExpanded && (
+        <div>
+          <div>
+            <label htmlFor="postTitle">Post title</label>
+            <input
+              id="postTitle"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            ></input>
+          </div>
+          <div>
+            <label htmlFor="postBody">body</label>
+            <input
+              id="postBody"
+              type="text"
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+            ></input>
+          </div>
+          {error && <h3>ERROR: {error}</h3>}
+          <button onClick={handleCreatePost}>Post</button>
+          {isExpanded && <button onClick={handleExpand}>Cancel</button>}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Navbar({ children }) {
   return <nav>{children}</nav>;
@@ -19,7 +86,9 @@ function Header({ onLinkClick, loggedinUser }) {
         </>
       )}
       <Navbar>
-        <Button onclick={onLinkClick}>Log in | Register</Button>
+        {!loggedinUser && (
+          <Button onclick={onLinkClick}>Log in | Register</Button>
+        )}
       </Navbar>
     </header>
   );
@@ -33,9 +102,48 @@ function Button({ children, onclick, color = 'rgb(87, 237, 112)' }) {
   );
 }
 
+function PostCommentStats({ postId }) {
+  const [latestComment, setLatestComment] = useState('');
+  const [totalComments, setTotalComments] = useState(0);
+
+  useEffect(
+    function () {
+      // returns the total number of comments for post and latest comment
+      async function fetchCommentData() {
+        const res = await fetch(
+          `http://192.168.1.203:8000/posts/${postId}/comments?limit=1&page=1&sort=-created_at`
+        );
+        const { data } = await res.json();
+        const { count } = data[0];
+        setTotalComments(() => Number(count));
+        setLatestComment(() => data[1][0]);
+      }
+      fetchCommentData();
+    },
+    [postId]
+  );
+
+  return (
+    <div>
+      {latestComment && totalComments && (
+        <div className="comments-stats">
+          <span>{totalComments} comments</span>
+          <span>
+            | last by {latestComment.author.username} at{' '}
+            {formatDate(latestComment.created_at, {
+              dateStyle: 'short',
+              timeStyle: 'short',
+            })}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PostPreview({ id, author, title, date, postSnippet, onSelectPost }) {
   return (
-    <div onClick={() => onSelectPost(id)} className="post-preview">
+    <div className="post-preview">
       <div
         style={{
           display: 'flex',
@@ -45,9 +153,11 @@ function PostPreview({ id, author, title, date, postSnippet, onSelectPost }) {
       >
         <Author author={author} />
         <div>
-          <h3>{title}</h3>
+          <h2>{title}</h2>
           <p>{postSnippet}</p>
-          <h3>Posted {new Date(date).toLocaleDateString()}</h3>
+          <span>Posted {new Date(date).toLocaleDateString()}</span>
+          <PostCommentStats postId={id} />
+          <Button onclick={() => onSelectPost(id)}>Add comment</Button>
         </div>
         <div></div>
       </div>
@@ -70,7 +180,13 @@ function Loading() {
 }
 function PostPreviewContainer({ onSelectPost }) {
   const [posts, setPosts] = useState([]);
-  const [page, setPage] = useState(1);
+  const [postSortSettings, setPostSortSettings] = useState({
+    limit: 25,
+    page: 1,
+    sortBy: 'created_at',
+    sortDesc: true,
+  });
+  const [totalNumPosts, setTotalNumPosts] = useState(0);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -79,17 +195,24 @@ function PostPreviewContainer({ onSelectPost }) {
       try {
         setIsLoading(true);
         const res = await fetch(
-          `http://192.168.1.203:8000/posts?limit=10&page=${page}&sort=-created_at`,
+          `http://192.168.1.203:8000/posts?limit=${
+            postSortSettings.limit
+          }&page=${postSortSettings.page}&sort=${
+            postSortSettings.sortDesc ? '-' : ''
+          }${postSortSettings.sortBy}`,
           { mode: 'cors' }
         );
         if (!res.ok) throw new Error('failed to fetch posts');
-        const data = await res.json();
-        if (data.data.length === 0) {
+        const { data } = await res.json();
+        const [numPosts, receivedPosts] = data;
+        console.log(receivedPosts);
+        if (receivedPosts.length === 0) {
           setError('No more posts :(');
         } else {
           setError('');
         }
-        setPosts(data.data);
+        setPosts(receivedPosts);
+        setTotalNumPosts(numPosts);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -97,28 +220,19 @@ function PostPreviewContainer({ onSelectPost }) {
       }
     }
     fetchPostData();
-  }, [page]);
-
-  function handlePrevPage() {
-    if (page > 1) setPage((page) => page - 1);
-  }
-  function handleNextPage() {
-    setPage((page) => page + 1);
-  }
+  }, [postSortSettings]);
 
   return (
     <div className="post-container">
-      <nav className="post-nav-buttons">
-        <Button color="lightgreen" onclick={handlePrevPage}>
-          Previous
-        </Button>
-        <span style={{ fontSize: '2rem' }}> {page} </span>
-        <Button color="lightgreen" onclick={handleNextPage}>
-          Next
-        </Button>
-      </nav>
+      <SettingsTab
+        entryType={'posts'}
+        settings={postSortSettings}
+        onSetSettings={setPostSortSettings}
+        totalNumEntries={totalNumPosts}
+      />
 
       {isLoading && <Loading />}
+      {!isLoading && !error && <CreatePost type={'post'} />}
       {!isLoading &&
         !error &&
         posts.map((post) => (
@@ -137,10 +251,6 @@ function PostPreviewContainer({ onSelectPost }) {
   );
 }
 
-function Box() {
-  return <div className="box">THIS IS AN EXAMPLE BOX</div>;
-}
-
 export default function App() {
   const [modalIsActive, setModalIsActive] = useState(false);
   const [selectedLink, setSelectedLink] = useState('');
@@ -152,34 +262,14 @@ export default function App() {
     setSelectedLink(e.target.textContent);
   }
 
-  async function handleCreatePost() {
-    const post = {
-      title: 'This is a post by Me',
-      body: 'Vestibulum non dolor in arcu scelerisque bibendum non id lectus. Curabitur lectus nisi, eleifend at orci quis, vestibulum posuere justo. Nullam maximus maximus nulla vel pellentesque. Duis id metus nec elit mollis malesuada. Sed et odio non orci faucibus finibus vitae interdum tellus. Ut mi lacus, gravida in enim id, efficitur vestibulum augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi ullamcorper ipsum eros, ac laoreet leo condimentum nec. Nam imperdiet erat elit, eu finibus justo euismod at. Donec eu lectus venenatis, malesuada nunc quis, sodales ante. Integer vehicula consequat elementum. Mauris placerat nunc nisl, et vestibulum sapien malesuada efficitur. Aliquam ac felis vehicula, accumsan mi eu, cursus massa. Donec bibendum porttitor augue, et dignissim nulla aliquet in. Fusce eros mi, euismod eget massa at, egestas maximus erat. Donec vel tortor tempus, facilisis mi nec, imperdiet arcu.',
-    };
-
-    const res = await fetch(`http://localhost:8000/posts`, {
-      method: 'POST',
-      // mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(post),
-    });
-    const data = await res.json();
-  }
-
   return (
     <div className="app">
-      {modalIsActive && (
+      {modalIsActive && !loggedinUser && (
         <Modal>
           <LoginRegisterForm onLogin={setLoggedinUser} />
         </Modal>
       )}
       <Header onLinkClick={handleToggleModal} loggedinUser={loggedinUser} />
-      <Button onclick={handleCreatePost}>Make a post</Button>
       {!selectedPost ? (
         <PostPreviewContainer onSelectPost={setSelectedPost} />
       ) : (
