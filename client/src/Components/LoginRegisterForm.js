@@ -36,9 +36,7 @@ export default function LoginRegisterForm({ onLogin }) {
 
   const registerLoginUser = async (obj) => {
     const res = await fetch(
-      `http://192.168.1.203:8000/auth/${
-        action === 'login' ? 'login' : 'signup'
-      }`,
+      `http://localhost:8000/auth/${action === 'login' ? 'login' : 'signup'}`,
       {
         method: 'POST',
         mode: 'cors',

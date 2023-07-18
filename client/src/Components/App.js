@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import cookies from 'js-cookies';
 import { formatDate } from '../utils';
 import Modal from './Modal';
 import Footer from './Footer';
@@ -6,6 +7,7 @@ import LoginRegisterForm from './LoginRegisterForm';
 import PostContainer from './Post';
 import Author from './Author';
 import { SettingsTab } from './SettingsTab';
+import { Header } from './Header';
 
 function CreatePost({ type }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -18,7 +20,7 @@ function CreatePost({ type }) {
       return setError('Title or body empty');
     if (type === 'comment' && !body) return setError('Comment body empty');
 
-    const res = await fetch(`http://192.168.1.203:8000/posts`, {
+    await fetch(`http://localhost:8000/posts`, {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
@@ -28,8 +30,6 @@ function CreatePost({ type }) {
       },
       body: JSON.stringify({ title, body }),
     });
-    const data = await res.json();
-    console.log(data);
   }
 
   function handleExpand() {
@@ -39,9 +39,9 @@ function CreatePost({ type }) {
   return (
     <div className="create-post">
       {!isExpanded && (
-        <button onClick={handleExpand}>
+        <Button onclick={handleExpand}>
           {type === 'post' ? 'Create a new post' : 'Add a comment'}
-        </button>
+        </Button>
       )}
       {isExpanded && (
         <div>
@@ -72,31 +72,9 @@ function CreatePost({ type }) {
   );
 }
 
-function Navbar({ children }) {
-  return <nav>{children}</nav>;
-}
-
-function Header({ onLinkClick, loggedinUser }) {
+export function Button({ children, onclick, style }) {
   return (
-    <header>
-      {loggedinUser && (
-        <>
-          <h2>Logged in as</h2>
-          <Author author={loggedinUser} />
-        </>
-      )}
-      <Navbar>
-        {!loggedinUser && (
-          <Button onclick={onLinkClick}>Log in | Register</Button>
-        )}
-      </Navbar>
-    </header>
-  );
-}
-
-function Button({ children, onclick, color = 'rgb(87, 237, 112)' }) {
-  return (
-    <button className="button" onClick={onclick}>
+    <button style={style} className="button" onClick={onclick}>
       {children}
     </button>
   );
@@ -125,17 +103,21 @@ function PostCommentStats({ postId }) {
 
   return (
     <div>
-      {latestComment && totalComments && (
-        <div className="comments-stats">
-          <span>{totalComments} comments</span>
-          <span>
-            | last by {latestComment.author.username} at{' '}
+      {latestComment && totalComments ? (
+        <div>
+          <p>
+            <b>{totalComments}</b> comments
+          </p>
+          <p>
+            last by {latestComment.author.username}{' '}
             {formatDate(latestComment.created_at, {
               dateStyle: 'short',
               timeStyle: 'short',
             })}
-          </span>
+          </p>
         </div>
+      ) : (
+        <div>No comments yet</div>
       )}
     </div>
   );
@@ -144,22 +126,19 @@ function PostCommentStats({ postId }) {
 function PostPreview({ id, author, title, date, postSnippet, onSelectPost }) {
   return (
     <div className="post-preview">
-      <div
-        style={{
-          display: 'flex',
-          backgroundColor: 'rgb(242, 255, 231)',
-          borderRadius: '10px',
-        }}
-      >
+      <div className="post-preview-inner-box">
         <Author author={author} />
-        <div>
-          <h2>{title}</h2>
-          <p>{postSnippet}</p>
-          <span>Posted {new Date(date).toLocaleDateString()}</span>
-          <PostCommentStats postId={id} />
-          <Button onclick={() => onSelectPost(id)}>Add comment</Button>
+        <div className="post-preview-content">
+          <h4>{title}</h4>
+          <p className="post-preview-text">{postSnippet}</p>
+          <span>Posted {new Date().toLocaleDateString()}</span>
         </div>
-        <div></div>
+        <div className="comment-info">
+          <PostCommentStats postId={id} />
+          <Button color="blue" onclick={() => onSelectPost(id)}>
+            Add comment
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -205,7 +184,6 @@ function PostPreviewContainer({ onSelectPost }) {
         if (!res.ok) throw new Error('failed to fetch posts');
         const { data } = await res.json();
         const [numPosts, receivedPosts] = data;
-        console.log(receivedPosts);
         if (receivedPosts.length === 0) {
           setError('No more posts :(');
         } else {
@@ -232,7 +210,6 @@ function PostPreviewContainer({ onSelectPost }) {
       />
 
       {isLoading && <Loading />}
-      {!isLoading && !error && <CreatePost type={'post'} />}
       {!isLoading &&
         !error &&
         posts.map((post) => (
@@ -257,24 +234,58 @@ export default function App() {
   const [loggedinUser, setLoggedinUser] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
 
+  useEffect(function () {
+    async function checkUserExists() {
+      // check for cookie with jwt
+      if (!cookies.getItem('jwt')) return;
+
+      // check jwt validity
+      const res = await fetch(`http://localhost:8000/auth/checkUser`, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
+      console.log(data);
+      if (data.status === 'ok') setLoggedinUser(data.user);
+    }
+    checkUserExists();
+  }, []);
+
   function handleToggleModal(e) {
     setModalIsActive((c) => !c);
     setSelectedLink(e.target.textContent);
+  }
+
+  function handleLogin(user) {
+    setLoggedinUser(user);
   }
 
   return (
     <div className="app">
       {modalIsActive && !loggedinUser && (
         <Modal>
-          <LoginRegisterForm onLogin={setLoggedinUser} />
+          <LoginRegisterForm onLogin={handleLogin} />
         </Modal>
       )}
-      <Header onLinkClick={handleToggleModal} loggedinUser={loggedinUser} />
-      {!selectedPost ? (
-        <PostPreviewContainer onSelectPost={setSelectedPost} />
-      ) : (
-        <PostContainer postId={selectedPost} onSelectPost={setSelectedPost} />
-      )}
+      <Header
+        onLinkClick={handleToggleModal}
+        loggedinUser={loggedinUser}
+        onLogOut={setLoggedinUser}
+      />
+      <div className="content">
+        {loggedinUser && <CreatePost type={'post'} />}
+        {!selectedPost ? (
+          <PostPreviewContainer onSelectPost={setSelectedPost} />
+        ) : (
+          <PostContainer postId={selectedPost} onSelectPost={setSelectedPost} />
+        )}
+      </div>
+
       <Footer />
     </div>
   );

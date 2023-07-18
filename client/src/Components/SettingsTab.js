@@ -31,7 +31,6 @@ export function SettingsTab({
 
   return (
     <div>
-      <h1>{entryType[0].toUpperCase() + entryType.slice(1)}</h1>
       <span>Display</span>
       <select id="Display" value={settings.limit} onChange={handleChangeLimit}>
         <option value={5}>5 {entryType}</option>

@@ -92,6 +92,10 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+exports.confirmAuth = catchAsync(async (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'User valid', user: req.user });
+});
+
 exports.restrictToRole =
   (...roles) =>
   (req, res, next) => {

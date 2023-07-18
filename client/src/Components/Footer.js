@@ -1,3 +1,13 @@
 export default function Footer() {
-  return <footer>This is the footer</footer>;
+  return (
+    <footer>
+      <div className="footer-contact-info">
+        <ul>
+          <li>
+            <span>Github: InfGibus</span>
+          </li>
+        </ul>
+      </div>
+    </footer>
+  );
 }
