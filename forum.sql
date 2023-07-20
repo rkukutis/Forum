@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS "posts" (
   "image" VARCHAR DEFAULT 'postDefault.jpg' NOT NULL,
   "body" text NOT NULL,
   "slug" text NOT NULL,
+  "comment_number" integer DEFAULT(0) NOT NULL,
   "user_id" integer NOT NULL,
   "created_at" TIMESTAMP DEFAULT NOW() NOT NULL
 );

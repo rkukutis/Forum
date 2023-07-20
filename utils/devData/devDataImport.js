@@ -28,11 +28,31 @@ const importData = (data) => {
   );
 };
 
+// Updates the number of mock comments from the default zero
+
+async function countComments() {
+  // Get ids of all posts
+  const posts = (await db.manyOrNone('SELECT id FROM posts')).map(
+    (obj) => obj.id
+  );
+  // Count comments that reference specific post
+  posts.forEach(async (id) => {
+    const commentNumObj =
+      await db.one(`SELECT COUNT(id) FROM comments WHERE post_id = ${id}; 
+    `);
+    // query returns object with count property
+    await db.none(
+      `UPDATE posts SET comment_number = ${commentNumObj.count} WHERE id = ${id}`
+    );
+  });
+}
+
 // importData(['users']);
 // importData(['posts']);
 // importData(['comments']);
 // importData(['announcements']);
 // resetSchema();
+// countComments();
 
 //
 // RUN THIS SCRIPT BY TYPING "node utils\devData\devDataImport.js"

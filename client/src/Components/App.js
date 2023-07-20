@@ -81,7 +81,7 @@ export function Button({ children, onclick, style }) {
   );
 }
 
-function PostCommentStats({ postId }) {
+function PostCommentStats({ post }) {
   const [latestComment, setLatestComment] = useState('');
   const [totalComments, setTotalComments] = useState(0);
 
@@ -90,8 +90,9 @@ function PostCommentStats({ postId }) {
       // returns the total number of comments for post and latest comment
       async function fetchCommentData() {
         const res = await fetch(
-          `http://192.168.1.203:8000/posts/${postId}/comments?limit=1&page=1&sort=-created_at`
+          `http://192.168.1.203:8000/posts/${post.id}/comments?limit=1&page=1&sort=-created_at`
         );
+        console.log(post);
         const { data } = await res.json();
         const { count } = data[0];
         setTotalComments(() => Number(count));
@@ -99,7 +100,7 @@ function PostCommentStats({ postId }) {
       }
       fetchCommentData();
     },
-    [postId]
+    [post]
   );
 
   return (
@@ -107,7 +108,10 @@ function PostCommentStats({ postId }) {
       {latestComment && totalComments ? (
         <div>
           <p>
-            <b>{totalComments}</b> comments
+            <b>
+              {totalComments} | {[post.comment_number]}
+            </b>{' '}
+            comments
           </p>
           <p>
             last by {latestComment.author.username}{' '}
@@ -124,19 +128,19 @@ function PostCommentStats({ postId }) {
   );
 }
 
-function PostPreview({ id, author, title, date, postSnippet, onSelectPost }) {
+function PostPreview({ post, postSnippet, onSelectPost }) {
   return (
     <div className="post-preview">
       <div className="post-preview-inner-box">
-        <Author author={author} />
+        <Author author={post.user} />
         <div className="post-preview-content">
-          <h4>{title}</h4>
+          <h4>{post.title}</h4>
           <p className="post-preview-text">{postSnippet}</p>
           <span>Posted {new Date().toLocaleDateString()}</span>
         </div>
         <div className="comment-info">
-          <PostCommentStats postId={id} />
-          <Button color="blue" onclick={() => onSelectPost(id)}>
+          <PostCommentStats post={post} />
+          <Button color="blue" onclick={() => onSelectPost(post.id)}>
             Add comment
           </Button>
         </div>
@@ -215,12 +219,9 @@ function PostPreviewContainer({ onSelectPost }) {
         !error &&
         posts.map((post) => (
           <PostPreview
+            post={post}
             key={post.id}
-            id={post.id}
-            author={post.user}
             postSnippet={post.body.split(' ').slice(0, 15).join(' ') + '...'}
-            title={post.title}
-            date={post.created_at}
             onSelectPost={onSelectPost}
           ></PostPreview>
         ))}
@@ -279,16 +280,16 @@ export default function App() {
         onLogOut={setLoggedinUser}
       />
 
-      {/* <div className="content">
+      <div className="content">
         {loggedinUser && <CreatePost type={'post'} />}
         {!selectedPost ? (
           <PostPreviewContainer onSelectPost={setSelectedPost} />
         ) : (
           <PostContainer postId={selectedPost} onSelectPost={setSelectedPost} />
         )}
-      </div> */}
+      </div>
 
-      <UserSettings />
+      {/* <UserSettings /> */}
 
       <Footer />
     </div>
