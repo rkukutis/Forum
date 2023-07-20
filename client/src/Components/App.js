@@ -8,6 +8,7 @@ import PostContainer from './Post';
 import Author from './Author';
 import { SettingsTab } from './SettingsTab';
 import { Header } from './Header';
+import { UserSettings } from './UserSettings';
 
 function CreatePost({ type }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -277,14 +278,17 @@ export default function App() {
         loggedinUser={loggedinUser}
         onLogOut={setLoggedinUser}
       />
-      <div className="content">
+
+      {/* <div className="content">
         {loggedinUser && <CreatePost type={'post'} />}
         {!selectedPost ? (
           <PostPreviewContainer onSelectPost={setSelectedPost} />
         ) : (
           <PostContainer postId={selectedPost} onSelectPost={setSelectedPost} />
         )}
-      </div>
+      </div> */}
+
+      <UserSettings />
 
       <Footer />
     </div>

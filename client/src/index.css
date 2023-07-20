@@ -11,10 +11,24 @@
   align-items: center;
 }
 
-.box {
-  background-color: aqua;
-  height: 100px;
-  width: 200px;
+.user-settings {
+  margin: 15vh 0 5vh 0;
+  background-color: #d0d0d0;
+  border-radius: 1rem;
+  width: 80%;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 30%;
+}
+
+.setting-tabs {
+  display: flex;
+  padding-top: 1rem;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 1rem 0 0 1rem;
+  background-color: rgb(123, 123, 123);
 }
 
 header {
