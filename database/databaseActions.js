@@ -66,11 +66,11 @@ exports.selectPosts = async (query) => {
       // each post comment, post or announcement has an author
       async (rows) =>
         rows.map(async (row) => {
-          // remove password from user info
-          const user = omit(
-            await db.one(`SELECT * FROM users WHERE id = $1`, [row.user_id]),
-            ['password']
+          const user = await db.one(
+            `SELECT id, username, image, role, status, created_at FROM users WHERE id = $1`,
+            [row.user_id]
           );
+
           const { count: numComments } = await db.one(
             `SELECT COUNT(*) FROM comments WHERE post_id = ${row.id}`
           );
@@ -105,14 +105,8 @@ exports.selectPost = async (action, table, column, value) => {
       ['password', 'password_changed']
     );
 
-    // TODO:  Comments should be fetched seperately
-
-    // combine and return post, author and comments
-    return Object.assign(
-      post,
-      { author: postAuthor }
-      // { comments: populatedComments }
-    );
+    // combine and return post, author
+    return Object.assign(post, { author: postAuthor });
   } catch (error) {
     throw new AppError(error, 500);
   }

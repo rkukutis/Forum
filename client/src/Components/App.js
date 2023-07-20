@@ -136,7 +136,7 @@ function PostPreview({ post, postSnippet, onSelectPost }) {
         <div className="post-preview-content">
           <h4>{post.title}</h4>
           <p className="post-preview-text">{postSnippet}</p>
-          <span>Posted {new Date().toLocaleDateString()}</span>
+          <span>Posted {new Date(post.created_at).toLocaleDateString()}</span>
         </div>
         <div className="comment-info">
           <PostCommentStats post={post} />

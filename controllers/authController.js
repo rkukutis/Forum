@@ -5,6 +5,7 @@ const databaseActions = require('../database/databaseActions');
 const passwordHash = require('../utils/passwordHash');
 const catchAsync = require('../utils/catchAsync');
 const Mail = require('../utils/mail');
+const generateRandomString = require('../utils/generateRandomString');
 
 const signToken = (username, email) =>
   jwt.sign({ username, email }, process.env.JWT_SECRET);
@@ -120,4 +121,74 @@ exports.restrictToAccountOwner = catchAsync(async (req, res, next) => {
     );
 
   next();
+});
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  // 1) Find user with correct email
+  const user = await databaseActions.selectUser(
+    'select',
+    'users',
+    'email',
+    email
+  );
+  if (!user) return next(new AppError('No user with this email adress', 404));
+
+  // 2) generate random string, add it and creation time to db
+  const randomString = generateRandomString(50);
+  const currentDateISO = new Date(Date.now()).toISOString();
+
+  await databaseActions.updateEntry(
+    'users',
+    { password_reset_code: randomString, password_changed: currentDateISO },
+    'id',
+    user.id
+  );
+
+  // 3) Send email with password reset string
+  const mail = new Mail(
+    user,
+    'Password reset Code',
+    `Enter this code to reset you password: ${randomString}. Code expires in 10 minutes`
+  );
+  mail.send();
+  res
+    .status(200)
+    .json({ status: 'ok', message: 'Password reset code or link sent' });
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const { resetCode, newPassword } = req.body;
+
+  // 1) Check if received code matches the one stored in the db and is not expired (10 min)
+  const user = await databaseActions.selectUser(
+    'select',
+    'users',
+    'password_reset_code',
+    resetCode
+  );
+
+  if (user.password_reset_code !== resetCode)
+    return next(new AppError('Wrong password reset code', 400));
+
+  if (Date.now() - new Date(user.password_changed).getTime() > 600000)
+    return next(new AppError('Password reset code has expired', 400));
+
+  // 2) Check if new password is not the same as the old one
+  if (await passwordHash.comparePasswords(user.password, newPassword))
+    return next(new AppError('New password is the same as the old one', 400));
+
+  // 3) Set new Password
+  await databaseActions.updateEntry(
+    'users',
+    {
+      // password is hashed in updateEntry()
+      password: newPassword,
+      password_reset_code: '',
+    },
+    'id',
+    user.id
+  );
+
+  res.status(200).json({ status: 'ok', message: 'Password reset' });
 });

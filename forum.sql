@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS "users" (
   "email_confirmed" BOOLEAN DEFAULT FALSE NOT NULL,
   "password" VARCHAR NOT NULL,
   "password_changed" TIMESTAMP,
-  "pasword_reset_code" VARCHAR,
+  "password_reset_code" VARCHAR,
   "image" VARCHAR DEFAULT 'userDefault.jpg' NOT NULL,
   "role" role DEFAULT 'user' NOT NULL,
   "status" status DEFAULT 'active',

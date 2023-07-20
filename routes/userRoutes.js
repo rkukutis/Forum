@@ -13,7 +13,7 @@ router.post(
   imageResize
 );
 
-router.use(authController.protect);
+// router.use(authController.protect);
 router
   .route('/')
   .get(userController.getDataUsers)
@@ -23,6 +23,6 @@ router
   .route('/:id')
   .get(userController.getUserData)
   .delete(userController.deleteUser)
-  .patch(authController.restrictToAccountOwner, userController.updateUser);
+  .patch(userController.updateUser);
 
 module.exports = router;
