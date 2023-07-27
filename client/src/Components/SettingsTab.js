@@ -1,9 +1,4 @@
-export function SettingsTab({
-  entryType,
-  settings,
-  onSetSettings,
-  totalNumEntries,
-}) {
+function SettingsTab({ entryType, settings, onSetSettings, totalNumEntries }) {
   const pages = Math.ceil(totalNumEntries / settings.limit);
 
   function handleChangeLimit(e) {
@@ -58,3 +53,5 @@ export function SettingsTab({
     </div>
   );
 }
+
+export default SettingsTab;

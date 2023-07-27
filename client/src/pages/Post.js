@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { formatDate } from '../utils';
-import Author from './Author';
-import { SettingsTab } from './SettingsTab';
+import Author from '../components/Author';
+import SettingsTab from '../components/SettingsTab';
+import CommentContainer from '../components/CommentContainer';
+import { useParams } from 'react-router-dom';
 
-export default function PostContainer({ postId, onSelectPost }) {
+export default function PostContainer() {
   const [post, setPost] = useState('');
   const [totalNumComments, setTotalNumComments] = useState(null);
   const [comments, setComments] = useState([]);
@@ -15,6 +17,8 @@ export default function PostContainer({ postId, onSelectPost }) {
     sortBy: 'created_at',
     sortDesc: true,
   });
+
+  const { postId } = useParams();
 
   useEffect(
     function () {
@@ -103,28 +107,6 @@ export default function PostContainer({ postId, onSelectPost }) {
           There was an error fetching this post. Please try again later :)
         </h1>
       )}
-      <button onClick={() => onSelectPost(null)}>Go back to all posts</button>
-    </div>
-  );
-}
-
-function CommentContainer({ comments }) {
-  return (
-    <div className="comment-container">
-      {comments.map((comment) => (
-        <Comment comment={comment} key={comment.id} />
-      ))}
-    </div>
-  );
-}
-
-function Comment({ comment }) {
-  return (
-    <div>
-      <Author author={comment.author} />
-      <h2>Comment ID: {comment.id}</h2>
-      <p>{comment.body}</p>
-      <h3>{formatDate(comment.created_at)}</h3>
     </div>
   );
 }

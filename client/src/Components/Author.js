@@ -1,6 +1,6 @@
 import { formatDate } from '../utils';
 
-export default function Author({ author }) {
+function Author({ author }) {
   return (
     <div className="author-info">
       <h3>{author.username}</h3>
@@ -18,3 +18,5 @@ export default function Author({ author }) {
     </div>
   );
 }
+
+export default Author;

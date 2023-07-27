@@ -1,23 +1,18 @@
-import Author from './Author';
-import { Navbar, Button } from './App';
-import LoginRegisterForm from './LoginRegisterForm';
+import { NavLink } from 'react-router-dom';
 
-export function Header({ onLinkClick, loggedinUser, onLogOut }) {
+function Header() {
   return (
     <header>
-      <div className="loggedin-user">
-        {loggedinUser ? (
-          <>
-            <img
-              src={`http://192.168.1.203:8000/userPhotos/user_${loggedinUser.id}.jpg`}
-              alt={`Current user ${loggedinUser.username}`}
-            ></img>
-            <Button onclick={() => onLogOut(null)}>Log out</Button>
-          </>
-        ) : (
-          <Button onclick={onLinkClick}>Log in | Register</Button>
-        )}
-      </div>
+      <ul>
+        <li>
+          <NavLink to="/">Home</NavLink>
+        </li>
+        <li>
+          <NavLink to="login">Login</NavLink>
+        </li>
+      </ul>
     </header>
   );
 }
+
+export default Header;

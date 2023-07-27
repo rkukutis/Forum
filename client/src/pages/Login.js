@@ -1,6 +1,5 @@
 import { useState } from 'react';
-
-export default function LoginRegisterForm({ onLogin }) {
+function Login({ onLogin }) {
   const [error, setError] = useState(null);
   const [action, setAction] = useState('login');
   const [username, setUsername] = useState('');
@@ -95,3 +94,5 @@ export default function LoginRegisterForm({ onLogin }) {
     </>
   );
 }
+
+export default Login;
