@@ -1,7 +1,6 @@
 import { formatDate } from '../utils';
 
 function Author({ author }) {
-  console.log(author);
   return (
     <div className="author-info">
       <h3>{author.username}</h3>

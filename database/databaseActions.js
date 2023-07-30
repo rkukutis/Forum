@@ -70,16 +70,9 @@ exports.selectPosts = async (query) => {
             [post.user_id]
           );
 
-          // Counting seperately may be faster than retrieving all comments
-          const { count } = await db.one(
-            `SELECT COUNT(id) FROM comments WHERE post_id = ${post.id}`
-          );
-          const numComments = Number(count);
-
-          if (!numComments)
+          if (!post.comment_number)
             return Object.assign(post, {
               user,
-              numComments,
             });
 
           // latest comment with author username
@@ -94,7 +87,6 @@ exports.selectPosts = async (query) => {
 
           return Object.assign(post, {
             user,
-            numComments,
             latestComment: {
               date: latestComment.created_at,
               author: latestCommentAuthor.username,
