@@ -58,23 +58,48 @@ exports.selectPosts = async (query) => {
 
     // Get number of total rows in table // pretty slow
     const { count: totalNumRows } =
-      await db.oneOrNone(`SELECT COUNT(*) FROM posts;
+      await db.oneOrNone(`SELECT COUNT(id) FROM posts;
     `);
 
-    // If the requested rows are for comments, posts or announcements
     const promiseArray = await data.then(
       // each post comment, post or announcement has an author
-      async (rows) =>
-        rows.map(async (row) => {
+      async (posts) =>
+        posts.map(async (post) => {
           const user = await db.one(
             `SELECT id, username, image, role, status, created_at FROM users WHERE id = $1`,
-            [row.user_id]
+            [post.user_id]
           );
 
-          const { count: numComments } = await db.one(
-            `SELECT COUNT(*) FROM comments WHERE post_id = ${row.id}`
+          // Counting seperately may be faster than retrieving all comments
+          const { count } = await db.one(
+            `SELECT COUNT(id) FROM comments WHERE post_id = ${post.id}`
           );
-          return Object.assign(row, { user, numComments });
+          const numComments = Number(count);
+
+          if (!numComments)
+            return Object.assign(post, {
+              user,
+              numComments,
+            });
+
+          // latest comment with author username
+          const latestComment = await db.oneOrNone(
+            'SELECT * FROM comments WHERE post_id = $1 ORDER BY created_at DESC LIMIT 1',
+            [post.id]
+          );
+          const latestCommentAuthor = await db.any(
+            'SELECT username FROM users WHERE id = $1',
+            [latestComment && latestComment.user_id]
+          );
+
+          return Object.assign(post, {
+            user,
+            numComments,
+            latestComment: {
+              date: latestComment.created_at,
+              author: latestCommentAuthor.username,
+            },
+          });
         })
     );
 
@@ -100,13 +125,13 @@ exports.selectPost = async (action, table, column, value) => {
     if (!post) throw new AppError('Post not found', 404);
 
     // get post author details and remove password (query 2)
-    const postAuthor = omit(
+    const author = omit(
       await db.one(`SELECT * FROM users WHERE id = $1`, [post.user_id]),
       ['password', 'password_changed']
     );
 
     // combine and return post, author
-    return Object.assign(post, { author: postAuthor });
+    return Object.assign(post, { author });
   } catch (error) {
     throw new AppError(error, 500);
   }

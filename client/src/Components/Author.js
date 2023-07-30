@@ -1,6 +1,7 @@
 import { formatDate } from '../utils';
 
 function Author({ author }) {
+  console.log(author);
   return (
     <div className="author-info">
       <h3>{author.username}</h3>
@@ -10,7 +11,7 @@ function Author({ author }) {
           borderColor: author.role === 'admin' ? 'crimson' : 'teal',
           borderStyle: 'solid',
         }}
-        src={`http://192.168.1.203:8000/userPhotos/user_${author.id}.jpg`}
+        src={`http://192.168.1.203:8000/userPhotos/${author.image}`}
         alt={`User ${author.username}`}
       />
       <h4>{[author.status, author.role].join(' ')} </h4>

@@ -14,7 +14,6 @@ const initialState = {
 function reducer(state, action) {
   switch (action.type) {
     case 'setPosts':
-      console.log(action);
       return {
         ...state,
         posts: action.payload.receivedPosts,
