@@ -15,7 +15,7 @@ function PostPreview({ post, postSnippet }) {
         </div>
         <div className="comment-info">
           <PostCommentStats post={post} />
-          <NavLink to={`post/${post.id}`}>
+          <NavLink to={`${post.id}`}>
             <Button color="blue">Add comment</Button>
           </NavLink>
         </div>

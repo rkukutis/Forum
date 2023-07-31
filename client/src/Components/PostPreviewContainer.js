@@ -1,8 +1,9 @@
-import { useState, useEffect, useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 import SettingsTab from './SettingsTab';
 import ErrorMessage from './ErrorMessage';
 import PostPreview from './PostPreview';
 import Loading from './Loading';
+import { useSearchParams } from 'react-router-dom';
 
 const initialState = {
   posts: [],
@@ -29,23 +30,22 @@ function reducer(state, action) {
 }
 
 function PostPreviewContainer() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const resultDisplaySettings = {limit: Number(searchParams.get('limit')), page: Number(searchParams.get('page')), sortBy: searchParams.get('sortBy'), sortDesc: Boolean(searchParams.get('sortDesc'))}
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [postSortSettings, setPostSortSettings] = useState({
-    limit: 25,
-    page: 1,
-    sortBy: 'created_at',
-    sortDesc: true,
-  });
+
+
+
 
   useEffect(() => {
     async function fetchPostData() {
       try {
         const res = await fetch(
           `http://192.168.1.203:8000/posts?limit=${
-            postSortSettings.limit
-          }&page=${postSortSettings.page}&sort=${
-            postSortSettings.sortDesc ? '-' : ''
-          }${postSortSettings.sortBy}`,
+            resultDisplaySettings.limit
+          }&page=${resultDisplaySettings.page}&sort=${
+            resultDisplaySettings.sortDesc ? '-' : ''
+          }${resultDisplaySettings.sortBy}`,
           { mode: 'cors' }
         );
         if (!res.ok) throw new Error('failed to fetch posts');
@@ -59,14 +59,14 @@ function PostPreviewContainer() {
       }
     }
     fetchPostData();
-  }, [postSortSettings]);
+  }, [resultDisplaySettings.limit, resultDisplaySettings.page, resultDisplaySettings.sortBy, resultDisplaySettings.sortDesc]);
 
   return (
     <div className="post-container">
       <SettingsTab
         entryType={'posts'}
-        settings={postSortSettings}
-        onSetSettings={setPostSortSettings}
+        settings={resultDisplaySettings}
+        onSetSettings={setSearchParams}
         totalNumEntries={state.totalNumPosts}
       />
 

@@ -6,13 +6,14 @@ function Header() {
   const{loggedInUser} = useLoggedInUser()
   return (
     <header>
-      <Author author={loggedInUser}/>
+      {loggedInUser && <Author author={loggedInUser}/>}
+
       <ul>
         <li>
           <NavLink to="/">Home</NavLink>
         </li>
         <li>
-          <NavLink to="login">Login</NavLink>
+          <NavLink to="/login">Login</NavLink>
         </li>
       </ul>
     </header>

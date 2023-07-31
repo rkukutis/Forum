@@ -1,3 +1,5 @@
+import Button from "./Button";
+
 function SettingsTab({ entryType, settings, onSetSettings, totalNumEntries }) {
   const pages = Math.ceil(totalNumEntries / settings.limit);
 
@@ -20,8 +22,11 @@ function SettingsTab({ entryType, settings, onSetSettings, totalNumEntries }) {
   function handleSortBy(e) {
     onSetSettings({ ...settings, sortBy: e.target.value });
   }
+
+  // FIX: doesn't work
   function toggleSortDirection() {
     onSetSettings({ ...settings, sortDesc: !settings.sortDesc });
+
   }
 
   return (
@@ -39,17 +44,17 @@ function SettingsTab({ entryType, settings, onSetSettings, totalNumEntries }) {
         <option value={'created_at'}>date</option>
         <option value={'id'}>id</option>
       </select>
-      <button onClick={toggleSortDirection}>
+      <Button onclick={toggleSortDirection}>
         {settings.sortDesc ? '⬇️ Descending order' : '⬆️ Ascending order'}
-      </button>
+      </Button>
       <span>
         Total {entryType}: {totalNumEntries}
       </span>
-      <button onClick={handlePreviousPage}>back</button>
+      <Button onclick={handlePreviousPage}>back</Button>
       <span>
         Page {settings.page} of {pages}
       </span>
-      <button onClick={handleNextPage}>forward</button>
+      <Button onclick={handleNextPage}>forward</Button>
     </div>
   );
 }

@@ -32,8 +32,7 @@ function UserProvider({children}){
     checkUserExists();
   }, []);
 
-
-if (loggedInUser) return <UserContext.Provider value={{loggedInUser, setLoggedInUser}}>
+return <UserContext.Provider value={{loggedInUser, setLoggedInUser}}>
 {children}
 </UserContext.Provider>
 
