@@ -1,5 +1,15 @@
 import { useState } from 'react';
-function Login({ onLogin }) {
+import { useLoggedInUser } from '../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
+
+// TODO: CLEANUP THIS GIGANTIC COMPONENT
+
+
+function Login() {
+  const {setLoggedInUser} = useLoggedInUser()
+  const navigate = useNavigate()
+
+
   const [error, setError] = useState(null);
   const [action, setAction] = useState('login');
   const [username, setUsername] = useState('');
@@ -48,7 +58,7 @@ function Login({ onLogin }) {
       }
     );
     const data = await res.json();
-    if (!data.error) onLogin(data.user);
+    if (!data.error) {setLoggedInUser(data.user); navigate(-1)};
   };
 
   return (

@@ -4,7 +4,7 @@ function Footer() {
       <div className="footer-contact-info">
         <ul>
           <li>
-            <span>Github: InfGibus</span>
+            <span>Github: rkukutis</span>
           </li>
         </ul>
       </div>
