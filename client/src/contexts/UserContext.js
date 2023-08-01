@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  cloneElement,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import cookies from 'js-cookies';
 
 const UserContext = createContext();
@@ -6,6 +12,7 @@ const UserContext = createContext();
 function UserProvider({ children }) {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [loginError, setLoginError] = useState('');
+  const [registerError, setRegisterError] = useState('');
 
   async function login(email, password) {
     try {
@@ -20,11 +27,33 @@ function UserProvider({ children }) {
         },
         body: JSON.stringify({ email, password }),
       });
-      if (res.status === 401) throw new Error('Wrong email or password');
-      const { user } = await res.json();
-      setLoggedInUser(user);
+      const data = await res.json();
+      if (data.error) throw new Error(data.message);
+      setLoggedInUser(data.user);
     } catch (err) {
       setLoginError(err.message);
+    }
+  }
+
+  async function register(username, email, password, passwordConfirm) {
+    try {
+      setLoginError('');
+      const res = await fetch('http://localhost:8000/auth/signup', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password, passwordConfirm }),
+      });
+      const data = await res.json();
+      console.log(data);
+      if (data.error) throw new Error(data.message);
+      setLoggedInUser(data.user);
+    } catch (err) {
+      setRegisterError(err.message);
     }
   }
 
@@ -50,7 +79,9 @@ function UserProvider({ children }) {
   }, []);
 
   return (
-    <UserContext.Provider value={{ loggedInUser, login, loginError }}>
+    <UserContext.Provider
+      value={{ loggedInUser, login, register, loginError, registerError }}
+    >
       {children}
     </UserContext.Provider>
   );

@@ -6,7 +6,6 @@ const initialState = {
   error: '',
   email: '',
   password: '',
-  status: '',
 };
 
 function reducer(state, action) {
@@ -22,19 +21,13 @@ function reducer(state, action) {
 
 function Login() {
   const [{ password, email }, dispatch] = useReducer(reducer, initialState);
-  const { login, loginError } = useLoggedInUser();
+  const { login, loginError, loggedInUser } = useLoggedInUser();
   const navigate = useNavigate();
-
-  // const [error, setError] = useState(null);
-  // const [username, setUsername] = useState('');
-  // const [password, setPassword] = useState('');
-  // const [passwordConfirm, setPasswordConfirm] = useState('');
-  // const [email, setEmail] = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
     await login(email, password);
-    if (!loginError)
+    if (!loginError && loggedInUser)
       navigate('/posts?limit=25&page=1&sortBy=created_at&sortDesc=true');
   }
 

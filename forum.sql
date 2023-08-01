@@ -1,6 +1,6 @@
 
 CREATE TYPE role AS ENUM ('user', 'moderator', 'admin');
-CREATE TYPE status AS ENUM ('active', 'banned');
+CREATE TYPE status AS ENUM ('unconfirmed','active', 'banned');
 
 
 -- CREATE TABLE IF NOT EXISTS "announcements" (

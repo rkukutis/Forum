@@ -12,8 +12,20 @@ const signToken = (username, email) =>
 
 exports.createUser = catchAsync(async (req, res, next) => {
   // 1) Get user data from request body
-  //TO DO: sanitize user input
-  const { username, email, password } = req.body;
+  const { username, email, password, passwordConfirm } = req.body;
+  if (!username || !email || !password)
+    return next(new AppError('Username, email or password missing'));
+  if (password !== passwordConfirm)
+    return next(new AppError('Passwords do not match'));
+  if (password.length >= 40 || email.length >= 40 || username.length >= 40)
+    return next(
+      new AppError(
+        'Password, username or email is too long (max 40 characters)'
+      )
+    );
+
+  // TODO: add a way to confirm email adress by sending to specified email
+
   // 2) Create token
   const token = signToken(username, email);
   // 3) Get back created user
@@ -21,7 +33,7 @@ exports.createUser = catchAsync(async (req, res, next) => {
     { username, email, password },
     'users'
   );
-  // 4) Send welcome email TODO: create email confirmation page
+  // 4) Send welcome email
   const mail = new Mail(
     user,
     'Welcome to the forum!',
