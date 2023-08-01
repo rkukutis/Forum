@@ -30,12 +30,14 @@ function reducer(state, action) {
 }
 
 function PostPreviewContainer() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const resultDisplaySettings = {limit: Number(searchParams.get('limit')), page: Number(searchParams.get('page')), sortBy: searchParams.get('sortBy'), sortDesc: Boolean(searchParams.get('sortDesc'))}
+  const [searchParams, setSearchParams] = useSearchParams();
+  const resultDisplaySettings = {
+    limit: Number(searchParams.get('limit')),
+    page: Number(searchParams.get('page')),
+    sortBy: searchParams.get('sortBy'),
+    sortDesc: Boolean(searchParams.get('sortDesc')),
+  };
   const [state, dispatch] = useReducer(reducer, initialState);
-
-
-
 
   useEffect(() => {
     async function fetchPostData() {
@@ -59,7 +61,12 @@ function PostPreviewContainer() {
       }
     }
     fetchPostData();
-  }, [resultDisplaySettings.limit, resultDisplaySettings.page, resultDisplaySettings.sortBy, resultDisplaySettings.sortDesc]);
+  }, [
+    resultDisplaySettings.limit,
+    resultDisplaySettings.page,
+    resultDisplaySettings.sortBy,
+    resultDisplaySettings.sortDesc,
+  ]);
 
   return (
     <div className="post-container">
