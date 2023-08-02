@@ -8,6 +8,7 @@ import Homepage from './pages/Homepage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { UserProvider } from './contexts/UserContext';
+import { PostsProvider } from './contexts/PostsContext';
 
 export default function App() {
   return (
@@ -15,8 +16,23 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route index element={<Homepage />} />
-          <Route path="/posts" element={<AllPosts />} />
-          <Route path="/posts/:postId" element={<Post />} />
+          <Route
+            path="/posts"
+            element={
+              <PostsProvider>
+                <AllPosts />
+              </PostsProvider>
+            }
+          />
+          <Route
+            path="/posts/:postId"
+            element={
+              // TODO: Create comment provider
+              <PostsProvider>
+                <Post />
+              </PostsProvider>
+            }
+          />
           <Route path="/auth" element={<Auth />}>
             <Route index element={<Navigate replace to={'login'} />} />
             <Route path="login" element={<Login />} />
