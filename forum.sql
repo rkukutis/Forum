@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS "users" (
   "password" VARCHAR NOT NULL,
   "password_changed" TIMESTAMP,
   "password_reset_code" VARCHAR,
+  "password_reset_link" VARCHAR,
   "image" VARCHAR DEFAULT 'userDefault.jpg' NOT NULL,
   "role" role DEFAULT 'user' NOT NULL,
   "status" status DEFAULT 'active',

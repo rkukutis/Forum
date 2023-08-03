@@ -147,12 +147,13 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   if (!user) return next(new AppError('No user with this email adress', 404));
 
   // 2) generate random string, add it and creation time to db
-  const randomString = generateRandomString(50);
+  const randomString = generateRandomString(32);
+  const hashedString = await passwordHash.hashPassword(randomString);
   const currentDateISO = new Date(Date.now()).toISOString();
 
   await databaseActions.updateEntry(
     'users',
-    { password_reset_code: randomString, password_changed: currentDateISO },
+    { password_reset_code: hashedString, password_changed: currentDateISO },
     'id',
     user.id
   );
@@ -161,7 +162,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const mail = new Mail(
     user,
     'Password reset Code',
-    `Enter this code to reset you password: ${randomString}. Code expires in 10 minutes`
+    `Enter this code to reset you password: ${randomString} or follow the link http://localhost:8000/auth/resetPassword?user=${user.email}&token=${randomString}}. Code expires in 10 minutes`
   );
   mail.send();
   res
@@ -170,19 +171,26 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
-  const { resetCode, newPassword } = req.body;
+  // email should be stored client side after requesting reset code
+  const { email, resetCode, newPassword } = req.body;
 
-  // 1) Check if received code matches the one stored in the db and is not expired (10 min)
+  // 1) Check if received email matches the one stored in the db and is not expired (10 min)
   const user = await databaseActions.selectUser(
     'select',
     'users',
-    'password_reset_code',
-    resetCode
+    'email',
+    email
   );
 
-  if (user.password_reset_code !== resetCode)
+  if (!user) return next(new AppError('This user does not exist'));
+
+  // Compare received plain string with stored hashed string
+  if (
+    !(await passwordHash.comparePasswords(user.password_reset_code, resetCode))
+  )
     return next(new AppError('Wrong password reset code', 400));
 
+  // Check reset code validity
   if (Date.now() - new Date(user.password_changed).getTime() > 600000)
     return next(new AppError('Password reset code has expired', 400));
 
@@ -194,7 +202,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await databaseActions.updateEntry(
     'users',
     {
-      // password is hashed in updateEntry()
+      // password will be hashed by updateEntry function
       password: newPassword,
       password_reset_code: '',
     },
@@ -202,5 +210,5 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     user.id
   );
 
-  res.status(200).json({ status: 'ok', message: 'Password reset' });
+  res.status(200).json({ status: 'ok', message: 'password reset' });
 });
