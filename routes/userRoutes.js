@@ -13,7 +13,7 @@ router.post(
   imageResize
 );
 
-// router.use(authController.protect);
+router.use(authController.protect);
 router
   .route('/')
   .get(userController.getDataUsers)

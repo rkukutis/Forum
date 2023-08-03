@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS "users" (
   "password_reset_link" VARCHAR,
   "image" VARCHAR DEFAULT 'userDefault.jpg' NOT NULL,
   "role" role DEFAULT 'user' NOT NULL,
-  "status" status DEFAULT 'active',
+  "status" status DEFAULT 'unconfirmed',
   "created_at" TIMESTAMP DEFAULT NOW() NOT NULL 
 );
 CREATE TABLE IF NOT EXISTS "posts" (

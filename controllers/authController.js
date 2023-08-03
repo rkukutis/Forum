@@ -24,26 +24,57 @@ exports.createUser = catchAsync(async (req, res, next) => {
       )
     );
 
-  // TODO: add a way to confirm email adress by sending to specified email
-
   // 2) Create token
   const token = signToken(username, email);
-  // 3) Get back created user
+  // 3) Get created user
+  const registrationCode = generateRandomString(64);
   const [user] = await databaseActions.insertData(
-    { username, email, password },
+    {
+      username,
+      email,
+      password,
+      registration_confirmation_code: registrationCode,
+    },
     'users'
   );
-  // 4) Send welcome email
+  // 4) Send email to ask for account confirmation
+  // user is of unconfirmed status until email confirmation, this will be used to restrict functionality
   const mail = new Mail(
     user,
     'Welcome to the forum!',
-    `We are glad to have you with us, ${user.username}`
+    `We are glad to have you with us, ${user.username}. Please follow this link to confirm your registration http://localhost:8000/auth/confirm?token=${registrationCode}`
   );
   mail.send();
 
   // return cookie
   res.cookie('jwt', token, { maxAge: 30 * 60 * 1000 });
   res.status(200).json({ status: 'success', user });
+});
+
+exports.confirmSignup = catchAsync(async (req, res, next) => {
+  const { code } = req.params;
+
+  const user = await databaseActions.selectUser(
+    'select',
+    'users',
+    'registration_confirmation_code',
+    code
+  );
+
+  if (!user) return next(new AppError('Wrong confirmation code', 400));
+
+  await databaseActions.updateEntry(
+    'users',
+    {
+      // password will be hashed by updateEntry function
+      status: 'active',
+      registration_confirmation_code: '',
+    },
+    'id',
+    user.id
+  );
+
+  res.status(200).json({ status: 'ok', message: 'user email confirmed' });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -98,7 +129,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   );
   if (!user) {
     return next(
-      new AppError('You have been logged out. Please try again later')
+      new AppError('You have been logged out. Please try again later', 400)
     );
   }
   req.user = user;
@@ -106,6 +137,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 exports.confirmAuth = catchAsync(async (req, res) => {
+  // receives user from protect middleware
   res.status(200).json({ status: 'ok', message: 'User valid', user: req.user });
 });
 
@@ -129,7 +161,7 @@ exports.restrictToAccountOwner = catchAsync(async (req, res, next) => {
   );
   if (!updatedUser || updatedUser.id !== req.user.id)
     return next(
-      new AppError('Only the owner of this account can make changes')
+      new AppError('Only the owner of this account can make changes', 403)
     );
 
   next();
@@ -182,7 +214,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     email
   );
 
-  if (!user) return next(new AppError('This user does not exist'));
+  if (!user) return next(new AppError('This user does not exist', 404));
 
   // Compare received plain string with stored hashed string
   if (

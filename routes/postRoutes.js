@@ -8,19 +8,26 @@ const router = express.Router();
 router
   .route('/:id')
   .get(postController.getPost)
-  .delete(postController.deletePost)
-  .patch(postController.updatePost);
+  .delete(authController.restrictToAccountOwner, postController.deletePost)
+  .patch(authController.restrictToAccountOwner, postController.updatePost);
 
 // create comment on certain post
 router
   .route('/:id/comments')
   .get(commentController.getComments)
-  .post(authController.protect, commentController.createComment);
+  .post(
+    authController.protect,
+    authController.protect,
+    commentController.createComment
+  );
 
 router
   .route('/')
   .post(authController.protect, postController.createPost)
   .get(postController.getAllPosts)
-  .delete(postController.deleteAllPosts);
+  .delete(
+    authController.restrictToRole(['admin']),
+    postController.deleteAllPosts
+  );
 
 module.exports = router;

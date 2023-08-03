@@ -1,6 +1,5 @@
 const catchAsync = require('../utils/catchAsync');
 const databaseActions = require('../database/databaseActions');
-const AppError = require('../utils/appError');
 
 exports.createComment = catchAsync(async (req, res, next) => {
   const comment = {
