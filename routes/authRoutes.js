@@ -9,5 +9,8 @@ router.post('/login', authController.login);
 router.post('/checkUser', authController.protect, authController.confirmAuth);
 router.post('/forgotPassword', authController.forgotPassword);
 router.post('/resetPassword', authController.resetPassword);
+router.post('/teapot', (req, res) => {
+  res.status(418).json({ status: "i'm a teapot" });
+});
 
 module.exports = router;
