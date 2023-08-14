@@ -19,7 +19,6 @@ export default function PostContainer() {
   });
 
   const { postId } = useParams();
-  console.log(postId)
   useEffect(
     function () {
       async function fetchPost() {

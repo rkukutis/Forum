@@ -7,30 +7,31 @@ import { useSearchParams } from 'react-router-dom';
 import { usePosts } from '../contexts/PostsContext';
 
 function PostPreviewContainer() {
-  const { receivedPosts, isLoading, error, sortSettings } = usePosts();
+  const {
+    receivedPosts,
+    isLoading,
+    error,
+    sortSettings,
+    updateSortSettings,
+    totalPosts,
+  } = usePosts();
   const [_, setSearchParams] = useSearchParams();
-  // const resultDisplaySettings = {
-  //   limit: Number(searchParams.get('limit')),
-  //   page: Number(searchParams.get('page')),
-  //   sortBy: searchParams.get('sortBy'),
-  //   sortDesc: Boolean(searchParams.get('sortDesc')),
-  // };
-  // const [state, dispatch] = useReducer(reducer, initialState);
 
   // synchronize URL with context sortSettings
-  useEffect(
-    function () {
-      setSearchParams(sortSettings);
-    },
-    [setSearchParams, sortSettings]
-  );
+  // useEffect(
+  //   function () {
+  //     setSearchParams(sortSettings);
+  //   },
+  //   [setSearchParams, sortSettings]
+  // );
 
   return (
     <div className="post-container">
       <SettingsTab
         entryType={'posts'}
         settings={sortSettings}
-        onSetSettings={setSearchParams}
+        onSetSettings={updateSortSettings}
+        totalNumPosts={totalPosts}
       />
 
       {isLoading && <Loading />}

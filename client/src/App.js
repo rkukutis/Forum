@@ -4,7 +4,6 @@ import AllPosts from './pages/AllPosts';
 import Post from './pages/Post';
 import Auth from './pages/Auth';
 import Error from './pages/Error';
-import Homepage from './pages/Homepage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { UserProvider } from './contexts/UserContext';
@@ -15,7 +14,7 @@ export default function App() {
     <UserProvider>
       <BrowserRouter>
         <Routes>
-          <Route index element={<Homepage />} />
+          <Route index element={<Navigate to="/posts" />} />
           <Route
             path="/posts"
             element={

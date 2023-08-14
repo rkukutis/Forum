@@ -1,38 +1,31 @@
-import { usePosts } from '../contexts/PostsContext';
 import Button from './Button';
 
-function SettingsTab({ entryType, settings, onSetSettings, totalNumEntries }) {
-  const { totalPosts, sortSettings, updateSortSettings } = usePosts();
-  const totalPages = Math.ceil(totalPosts / sortSettings.limit);
+function SettingsTab({ entryType, totalNumPosts, settings, onSetSettings }) {
+  const totalPages = Math.ceil(totalNumPosts / settings.limit);
 
   function handleChangeLimit(e) {
-    if (sortSettings.limit === e.target.value) return;
-    updateSortSettings({ limit: e.target.value, page: 1 });
+    if (settings.limit === e.target.value) return;
+    onSetSettings({ limit: e.target.value, page: 1 });
   }
-  function handleNextPage(e) {
-    if (sortSettings.page === totalPages) return;
-    updateSortSettings({ page: sortSettings.page + 1 });
+  function handleNextPage() {
+    if (settings.page === totalPages) return;
+    onSetSettings({ page: settings.page + 1 });
   }
   function handlePreviousPage() {
     if (settings.page === 1) return;
-    updateSortSettings({ page: sortSettings.page - 1 });
+    onSetSettings({ page: settings.page - 1 });
   }
   function handleSortBy(e) {
-    updateSortSettings({ sortBy: e.target.value });
+    onSetSettings({ sortBy: e.target.value });
   }
-  // FIX: doesn't work
-  function toggleSortDirection() {
-    onSetSettings({ sortDesc: !sortSettings.sortDesc });
+  function handleChangeSortDirection() {
+    onSetSettings({ sortDesc: !settings.sortDesc });
   }
 
   return (
     <div>
       <span>Display</span>
-      <select
-        id="Display"
-        value={sortSettings.limit}
-        onChange={handleChangeLimit}
-      >
+      <select id="Display" value={settings.limit} onChange={handleChangeLimit}>
         <option value={5}>5 {entryType}</option>
         <option value={10}>10 {entryType}</option>
         <option value={25}>25 {entryType}</option>
@@ -40,19 +33,19 @@ function SettingsTab({ entryType, settings, onSetSettings, totalNumEntries }) {
         <option value={100}>100 {entryType}</option>
       </select>
       <span>Sort by</span>
-      <select value={sortSettings.sortBy} onChange={handleSortBy}>
+      <select value={settings.sortBy} onChange={handleSortBy}>
         <option value={'created_at'}>date</option>
         <option value={'id'}>id</option>
       </select>
-      <Button onclick={toggleSortDirection}>
-        {sortSettings.sortDesc ? '⬇️ Descending order' : '⬆️ Ascending order'}
+      <Button onclick={handleChangeSortDirection}>
+        {settings.sortDesc ? '⬇️ Descending order' : '⬆️ Ascending order'}
       </Button>
       <span>
-        Total {entryType}: {totalNumEntries}
+        Total {entryType}: {totalNumPosts}
       </span>
       <Button onclick={handlePreviousPage}>back</Button>
       <span>
-        Page {sortSettings.page} of {totalPages}
+        Page {settings.page} of {totalPages}
       </span>
       <Button onclick={handleNextPage}>forward</Button>
     </div>
