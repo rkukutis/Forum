@@ -40,7 +40,6 @@ function PostsProvider({ children }) {
   ] = useReducer(reducer, initialState);
 
   function updateSortSettings(newSettings) {
-    console.log(newSettings);
     dispatch({ type: 'sortSettingsChanged', payload: newSettings });
   }
 

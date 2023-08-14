@@ -1,10 +1,10 @@
-import { useEffect, useReducer } from 'react';
 import SettingsTab from './SettingsTab';
 import ErrorMessage from './ErrorMessage';
 import PostPreview from './PostPreview';
 import Loading from './Loading';
 import { useSearchParams } from 'react-router-dom';
 import { usePosts } from '../contexts/PostsContext';
+import { useEffect } from 'react';
 
 function PostPreviewContainer() {
   const {
@@ -18,12 +18,12 @@ function PostPreviewContainer() {
   const [_, setSearchParams] = useSearchParams();
 
   // synchronize URL with context sortSettings
-  // useEffect(
-  //   function () {
-  //     setSearchParams(sortSettings);
-  //   },
-  //   [setSearchParams, sortSettings]
-  // );
+  useEffect(
+    function () {
+      setSearchParams(sortSettings);
+    },
+    [setSearchParams, sortSettings]
+  );
 
   return (
     <div className="post-container">

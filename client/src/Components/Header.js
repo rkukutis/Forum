@@ -1,11 +1,19 @@
+import { Link } from 'react-router-dom';
 import { useLoggedInUser } from '../contexts/UserContext';
 import Author from './Author';
+import Button from './Button';
 
 function Header({ children }) {
   const { loggedInUser } = useLoggedInUser();
   return (
     <header>
+      {!loggedInUser && (
+        <Link to="/auth">
+          <Button>Login | Register</Button>
+        </Link>
+      )}
       {loggedInUser && <Author author={loggedInUser} />}
+
       {children}
     </header>
   );

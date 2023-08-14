@@ -32,11 +32,11 @@
 }
 
 header {
-  /* position: fixed;
-  display: block; */
+  display: block;
+  padding: 20px 50px 20px 50px;
   background-color: rgb(72, 72, 72);
   width: 100vw;
-  height: 10vh;
+  height: 100px;
 }
 
 .loggedin-user {
