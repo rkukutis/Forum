@@ -21,14 +21,15 @@ function reducer(state, action) {
 
 function Login() {
   const [{ password, email }, dispatch] = useReducer(reducer, initialState);
-  const { login, loginError, loggedInUser } = useLoggedInUser();
+  const { login, loginError } = useLoggedInUser();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await login(email, password);
-    if (!loginError && loggedInUser)
-      navigate('/posts?limit=25&page=1&sortBy=created_at&sortDesc=true');
+    const user = await login(email, password);
+    if (user && !loginError) {
+      navigate('/posts');
+    }
   }
 
   return (

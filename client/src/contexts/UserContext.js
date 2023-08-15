@@ -24,6 +24,7 @@ function UserProvider({ children }) {
       const data = await res.json();
       if (data.error) throw new Error(data.message);
       setLoggedInUser(data.user);
+      return data.user;
     } catch (err) {
       setLoginError(err.message);
     }

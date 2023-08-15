@@ -4,9 +4,10 @@ import { useFetcher, useParams } from 'react-router-dom';
 const MainPostContext = createContext();
 
 const initialState = {
+  postId: null,
   mainPost: {},
   error: '',
-  isLoading: false,
+  isLoading: true,
   sortSettings: { page: 1, limit: 25, sortBy: 'created_at', sortDesc: true },
 };
 
@@ -26,11 +27,10 @@ function reducer(state, action) {
 }
 
 function MainPostProvider({ children }) {
-  const [{ mainPost, error, isLoading }, dispatch] = useReducer(
+  const [{ mainPost, error, isLoading, postId }, dispatch] = useReducer(
     reducer,
     initialState
   );
-  const { postId } = useParams();
 
   useEffect(
     function () {
@@ -39,7 +39,6 @@ function MainPostProvider({ children }) {
           dispatch({ type: 'loading' });
           const res = await fetch(`http://192.168.1.203:8000/posts/${postId}`);
           const { data } = await res.json();
-          console.log(data);
           dispatch({ type: 'mainPostFetched', payload: data });
         } catch (err) {
           dispatch({ type: 'fetchError', payload: err.message });
@@ -57,7 +56,7 @@ function MainPostProvider({ children }) {
 
   return (
     <MainPostContext.Provider
-      value={(getPostId, postId, mainPost, error, isLoading)}
+      value={{ getPostId, postId, mainPost, error, isLoading }}
     >
       {children}
     </MainPostContext.Provider>

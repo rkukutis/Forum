@@ -1,6 +1,13 @@
 import Button from './Button';
 
-function SettingsTab({ entryType, totalNumPosts, settings, onSetSettings }) {
+// onSetSettings - wrapped dispatch function
+function SettingsTab({
+  entryType,
+  totalNumPosts,
+  settings,
+  onSetSettings,
+  sortBySelections,
+}) {
   const totalPages = Math.ceil(totalNumPosts / settings.limit);
 
   function handleChangeLimit(e) {
