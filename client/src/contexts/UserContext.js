@@ -11,7 +11,8 @@ function UserProvider({ children }) {
   async function login(email, password) {
     try {
       setLoginError('');
-      const res = await fetch('http://localhost:8000/auth/login', {
+      // when using on local network cookie is not being set from this address
+      const res = await fetch('http://192.168.1.203:8000/auth/login', {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
@@ -58,7 +59,7 @@ function UserProvider({ children }) {
       if (!cookies.getItem('jwt')) return;
 
       // check jwt validity
-      const res = await fetch(`http://localhost:8000/auth/checkUser`, {
+      const res = await fetch(`http://192.168.1.203:8000/auth/checkUser`, {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
