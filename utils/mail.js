@@ -24,6 +24,6 @@ module.exports = class Mail {
       subject: this.subject,
       text: this.message,
     });
-    console.log('Message sent: %s', info.messageId);
+    console.log('Message sent: ', info.messageId);
   }
 };

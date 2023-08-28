@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useReducer } from 'react';
-import { useFetcher, useParams } from 'react-router-dom';
 
 const MainPostContext = createContext();
 
