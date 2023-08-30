@@ -1,5 +1,5 @@
 import { formatDate } from '../utils';
-import Author from '../components/Author';
+import Author from './Author';
 
 function Comment({ comment }) {
   return (
