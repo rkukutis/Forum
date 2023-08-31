@@ -1,23 +1,30 @@
-import Author from './Author';
-import { PostCommentStats } from './PostCommentStats';
-import Button from './Button';
-import { NavLink } from 'react-router-dom';
+import Author from "../components/Author";
+import { PostCommentStats } from "./PostCommentStats";
+import Button from "../components/Button";
+import { NavLink } from "react-router-dom";
 
 function PostPreview({ post, postSnippet }) {
   return (
-    <div className="post-preview">
-      <div className="post-preview-inner-box">
+    <div className="flex items-center space-x-3 rounded-md bg-slate-100 px-5 py-5">
+      <div className="flex-shrink-0">
         <Author author={post.user} />
-        <div className="post-preview-content">
-          <h4>{post.title}</h4>
-          <p className="post-preview-text">{postSnippet}</p>
-          <span>Posted {new Date(post.created_at).toLocaleDateString()}</span>
+      </div>
+      <div className="">
+        <div className="">
+          <h4 className="text-sm font-semibold capitalize">{post.title}</h4>
+          <p className="hidden text-sm sm:block">{postSnippet}</p>
+          <span className="text-xs">
+            Posted {new Date(post.created_at).toLocaleDateString()}
+          </span>
         </div>
-        <div className="comment-info">
-          <PostCommentStats post={post} />
+        <div className="mt-2 flex items-center space-x-5">
+          <p className="text-sm font-light text-slate-800">
+            {post.comment_number} comments
+          </p>
           <NavLink to={`${post.id}`}>
             <Button color="blue">Add comment</Button>
           </NavLink>
+          <p></p>
         </div>
       </div>
     </div>

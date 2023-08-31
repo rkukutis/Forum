@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { formatDate } from '../utils';
-import Author from './Author';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { formatDate } from "../utils";
+import Author from "../components/Author";
+import { useParams } from "react-router-dom";
 
 function MainPost() {
   const { postId } = useParams();
   const [post, setPost] = useState({});
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(
@@ -26,7 +26,7 @@ function MainPost() {
       }
       fetchPost();
     },
-    [postId]
+    [postId],
   );
 
   return (

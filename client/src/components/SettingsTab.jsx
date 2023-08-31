@@ -1,4 +1,4 @@
-import Button from './Button';
+import Button from "./Button";
 
 // onSetSettings - wrapped dispatch function
 function SettingsTab({
@@ -30,9 +30,14 @@ function SettingsTab({
   }
 
   return (
-    <div>
+    <div className="space-x-2 space-y-2 px-5 py-5 ">
       <span>Display</span>
-      <select id="Display" value={settings.limit} onChange={handleChangeLimit}>
+      <select
+        id="Display"
+        value={settings.limit}
+        onChange={handleChangeLimit}
+        className=""
+      >
         <option value={5}>5 {entryType}</option>
         <option value={10}>10 {entryType}</option>
         <option value={25}>25 {entryType}</option>
@@ -41,11 +46,11 @@ function SettingsTab({
       </select>
       <span>Sort by</span>
       <select value={settings.sortBy} onChange={handleSortBy}>
-        <option value={'created_at'}>date</option>
-        <option value={'id'}>id</option>
+        <option value={"created_at"}>date</option>
+        <option value={"id"}>id</option>
       </select>
       <Button onclick={handleChangeSortDirection}>
-        {settings.sortDesc ? '⬇️ Descending order' : '⬆️ Ascending order'}
+        {settings.sortDesc ? "⬇️ Descending order" : "⬆️ Ascending order"}
       </Button>
       <span>
         Total {entryType}: {totalNumPosts}

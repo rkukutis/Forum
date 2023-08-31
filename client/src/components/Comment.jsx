@@ -1,5 +1,5 @@
-import { formatDate } from '../utils';
-import Author from './Author';
+import { formatDate } from "../utils";
+import Author from "./Author";
 
 function Comment({ comment }) {
   return (

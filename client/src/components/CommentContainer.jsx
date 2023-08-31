@@ -1,33 +1,33 @@
-import { useEffect, useReducer, useState } from 'react';
-import Comment from './Comment';
-import { useParams } from 'react-router-dom';
-import SettingsTab from './SettingsTab';
+import { useEffect, useReducer, useState } from "react";
+import Comment from "./Comment";
+import { useParams } from "react-router-dom";
+import SettingsTab from "../components/SettingsTab";
 
 const initialState = {
   comments: [],
   totalComments: 0,
   isLoading: true,
-  error: '',
+  error: "",
   commentDisplaySettings: {
     page: 1,
     limit: 25,
-    sortBy: 'created_at',
+    sortBy: "created_at",
     sortDesc: true,
   },
 };
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'commentsFetched':
+    case "commentsFetched":
       return {
         ...state,
         comments: action.payload.comments,
         totalComments: action.payload.count,
         isLoading: false,
       };
-    case 'fetchFailed':
+    case "fetchFailed":
       return { ...state, error: action.payload, isLoading: false };
-    case 'displayUpdate':
+    case "displayUpdate":
       return {
         ...state,
         commentDisplaySettings: {
@@ -36,7 +36,7 @@ function reducer(state, action) {
         },
       };
     default:
-      throw new Error('Unknown action');
+      throw new Error("Unknown action");
   }
 }
 
@@ -49,7 +49,7 @@ function CommentContainer() {
   const { postId } = useParams();
 
   function updateDisplaySettings(newSettings) {
-    dispatch({ type: 'displayUpdate', payload: newSettings });
+    dispatch({ type: "displayUpdate", payload: newSettings });
   }
 
   useEffect(
@@ -60,20 +60,20 @@ function CommentContainer() {
             `http://192.168.1.203:8000/posts/${postId}/comments?limit=${
               commentDisplaySettings.limit
             }&page=${commentDisplaySettings.page}&sort=${
-              commentDisplaySettings.sortDesc ? '-' : ''
-            }${commentDisplaySettings.sortBy}`
+              commentDisplaySettings.sortDesc ? "-" : ""
+            }${commentDisplaySettings.sortBy}`,
           );
           const { data } = await res.json();
           console.log(data);
           dispatch({
-            type: 'commentsFetched',
+            type: "commentsFetched",
             payload: {
               comments: data[1],
               count: Number(Object.values(data[0])),
             },
           });
         } catch (err) {
-          dispatch({ type: 'fetchFailed', payload: err.message });
+          dispatch({ type: "fetchFailed", payload: err.message });
         }
       }
 
@@ -85,7 +85,7 @@ function CommentContainer() {
       commentDisplaySettings.page,
       commentDisplaySettings.sortDesc,
       commentDisplaySettings.sortBy,
-    ]
+    ],
   );
 
   return (
@@ -93,7 +93,7 @@ function CommentContainer() {
       {!isLoading && !error && (
         <>
           <SettingsTab
-            entryType={'comments'}
+            entryType={"comments"}
             totalNumPosts={totalComments}
             settings={commentDisplaySettings}
             onSetSettings={updateDisplaySettings}
