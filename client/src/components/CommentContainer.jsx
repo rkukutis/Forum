@@ -89,7 +89,7 @@ function CommentContainer() {
   );
 
   return (
-    <div className="comment-container">
+    <div className="flex flex-col">
       {!isLoading && !error && (
         <>
           <SettingsTab
