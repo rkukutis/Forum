@@ -7,6 +7,10 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import SinglePost from "./pages/SinglePost";
 import Layout from "./pages/Layout";
+import UserAccount from "./pages/UserAccount";
+import AccountInfo from "./components/AccountInfo";
+import AccountSettings from "./components/AccountSettings";
+import AccountClose from "./components/AccountClose";
 
 export default function App() {
   return (
@@ -21,6 +25,11 @@ export default function App() {
               <Route index element={<Navigate replace to={"login"} />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
+            </Route>
+            <Route path="account" element={<UserAccount />}>
+              <Route path="info" element={<AccountInfo />} />
+              <Route path="settings" element={<AccountSettings />} />
+              <Route path="close" element={<AccountClose />} />
             </Route>
           </Route>
         </Routes>

@@ -12,7 +12,13 @@ function Header({ children }) {
           <Button>Login | Register</Button>
         </Link>
       )}
-      {loggedInUser && <Author author={loggedInUser} />}
+      {loggedInUser && (
+        <div>
+          <Link to="/account">
+            <Author author={loggedInUser} />
+          </Link>
+        </div>
+      )}
 
       {children}
     </header>
