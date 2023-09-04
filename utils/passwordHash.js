@@ -10,7 +10,7 @@ exports.hashPassword = async (password) => {
 
 exports.comparePasswords = async (hash, password) => {
   try {
-    await argon2.verify(hash, password);
+    return await argon2.verify(hash, password);
   } catch (error) {
     throw new Error(error.message);
   }

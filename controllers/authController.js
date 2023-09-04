@@ -92,6 +92,7 @@ exports.login = catchAsync(async (req, res, next) => {
     'email',
     email
   );
+  console.log(await passwordHash.comparePasswords(user.password, password));
 
   // Check if user exists and if passwords match
   if (

@@ -6,10 +6,10 @@ function Auth() {
     <div className="auth-container">
       <div className="auth-box">
         <div className="auth-btns">
-          <NavLink to="auth/login">
+          <NavLink to="login">
             <Button>Login</Button>
           </NavLink>
-          <NavLink to="auth/register">
+          <NavLink to="register">
             <Button>Register</Button>
           </NavLink>
         </div>
