@@ -14,6 +14,7 @@ function Header({ children }) {
       )}
       {loggedInUser && (
         <div>
+          <Link to="/posts">Posts</Link>
           <Link to="/account">
             <Author author={loggedInUser} />
           </Link>

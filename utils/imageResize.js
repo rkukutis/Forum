@@ -3,6 +3,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const catchAsync = require('./catchAsync');
 const AppError = require('./appError');
+const { updateEntry } = require('../database/databaseActions');
 
 // Multer setup
 const storage = multer.memoryStorage();
@@ -30,12 +31,20 @@ exports.upload = multer({
 // https://github.com/expressjs/multer#error-handling
 
 exports.imageResize = catchAsync(async (req, res, next) => {
+  console.log(req.file);
   if (!req.file) return next(new AppError('Please select an image'));
 
   const imagePath = `./img/users/user_${req.user.id}.jpg`;
   await sharp(req.file.buffer)
     .resize(200, 200)
     .toFile(imagePath, (err) => err && next(new AppError(err)));
+
+  await updateEntry(
+    'users',
+    { image: `user_${req.user.id}.jpg` },
+    'id',
+    req.user.id
+  );
 
   res.status(200).json({ status: 'ok', message: 'Image uploaded' });
 });

@@ -54,6 +54,8 @@ function UserProvider({ children }) {
     }
   }
 
+  // Checking this every nabiagtion often fails and authenticated user details are not fetched
+  // TODO: Find better solution for storing logged in user
   useEffect(function () {
     async function checkUserExists() {
       // check for cookie with jwt

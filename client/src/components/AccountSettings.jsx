@@ -1,9 +1,25 @@
+import { useState } from "react";
 import Button from "./Button";
+import { json } from "react-router-dom";
 
 function AccountSettings() {
-  async function handleSubmit() {
+  const [image, setImage] = useState({});
+
+  async function handleSubmit(e) {
     try {
-      // TODO: figure out image upload
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append("avatar", image);
+
+      const res = await fetch("http://localhost:8000/users/uploadPhoto", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "include",
+        body: formData,
+      });
+      const data = await res.json();
+      console.log(data);
     } catch (err) {
       console.log(err);
     }
@@ -13,8 +29,13 @@ function AccountSettings() {
     <div>
       <form>
         <label htmlFor="img">Submit new profile picture</label>
-        <input type="file" id="img" name="img" accept="image" />
-        <Button>Upload Picture</Button>
+        <input
+          type="file"
+          id="img"
+          name="image"
+          onInput={(e) => setImage(e.target.files[0])}
+        />
+        <Button onclick={handleSubmit}>Upload Picture</Button>
       </form>
     </div>
   );
