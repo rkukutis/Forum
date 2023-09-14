@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useReducer } from 'react';
+import config from  "../config.json"
+
 
 const MainPostContext = createContext();
 
@@ -36,7 +38,7 @@ function MainPostProvider({ children }) {
       async function fetchPost() {
         try {
           dispatch({ type: 'loading' });
-          const res = await fetch(`http://192.168.1.203:8000/posts/${postId}`);
+          const res = await fetch(`http://${config}:8000/posts/${postId}`);
           const { data } = await res.json();
           dispatch({ type: 'mainPostFetched', payload: data });
         } catch (err) {

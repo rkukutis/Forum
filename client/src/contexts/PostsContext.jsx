@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useReducer } from 'react';
+import config from  "../config.json"
+
 
 const PostsContext = createContext();
 
@@ -48,7 +50,7 @@ function PostsProvider({ children }) {
       try {
         dispatch({ type: 'loading' });
         const res = await fetch(
-          `http://192.168.1.203:8000/posts?limit=${sortSettings.limit}&page=${
+          `http://${config.backendBaseAdress}:8000/posts?limit=${sortSettings.limit}&page=${
             sortSettings.page
           }&sort=${sortSettings.sortDesc ? '-' : ''}${sortSettings.sortBy}`,
           { mode: 'cors' }

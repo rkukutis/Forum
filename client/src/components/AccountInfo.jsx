@@ -1,5 +1,6 @@
 import { useLoggedInUser } from "../contexts/UserContext";
 import { formatDate } from "../utils";
+import config from "../config.json"
 
 function AccountInfo() {
   const { loggedInUser } = useLoggedInUser();
@@ -9,7 +10,7 @@ function AccountInfo() {
     <div className="bg-slate-300">
       <img
         className="h-24 rounded-full"
-        src={`http://192.168.1.203:8000/userPhotos/${loggedInUser.image}`}
+        src={`${config.backendBaseAdress}:8000/userPhotos/${loggedInUser.image}`}
         alt={loggedInUser.username}
       />
       <p>Username: {loggedInUser?.username}</p>

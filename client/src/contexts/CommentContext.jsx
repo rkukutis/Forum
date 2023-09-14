@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useReducer } from 'react';
 import { useParams } from 'react-router-dom';
+import config from  "../config.json"
+
 
 const CommentsContext = createContext();
 
@@ -41,7 +43,7 @@ function CommentsProvider({ children }) {
         try {
           dispatch({ type: 'loading' });
           const res = await fetch(
-            `http://192.168.1.203:8000/posts/${postId}/comments?limit=${
+            `http://${config.backendBaseAdress}:8000/posts/${postId}/comments?limit=${
               commentSortSettings.limit
             }&page=${commentSortSettings.page}&sort=${
               commentSortSettings.sortDesc ? '-' : ''

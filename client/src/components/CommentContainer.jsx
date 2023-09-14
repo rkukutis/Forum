@@ -2,6 +2,8 @@ import { useEffect, useReducer, useState } from "react";
 import Comment from "./Comment";
 import { useParams } from "react-router-dom";
 import SettingsTab from "../components/SettingsTab";
+import config from  "../config.json"
+
 
 const initialState = {
   comments: [],
@@ -57,7 +59,7 @@ function CommentContainer() {
       async function fetchPost() {
         try {
           const res = await fetch(
-            `http://192.168.1.203:8000/posts/${postId}/comments?limit=${
+            `http://${config.backendBaseAdress}:8000/posts/${postId}/comments?limit=${
               commentDisplaySettings.limit
             }&page=${commentDisplaySettings.page}&sort=${
               commentDisplaySettings.sortDesc ? "-" : ""

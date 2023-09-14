@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import Button from './Button';
+import config from  "../config.json"
+
 
 function CreatePost({ type }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -12,7 +14,7 @@ function CreatePost({ type }) {
       return setError('Title or body empty');
     if (type === 'comment' && !body) return setError('Comment body empty');
 
-    await fetch(`http://localhost:8000/posts`, {
+    await fetch(`http://${config.backendBaseAdress}:8000/posts`, {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
