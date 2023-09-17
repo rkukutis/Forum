@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AllPosts from "./pages/AllPosts";
 import Auth from "./pages/Auth";
 import Login from "./pages/Login";
@@ -12,29 +14,40 @@ import AccountInfo from "./components/AccountInfo";
 import AccountSettings from "./components/AccountSettings";
 import AccountClose from "./components/AccountClose";
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // staleTime: 60 * 1000,
+    },
+  },
+});
+
 export default function App() {
   return (
-    <UserProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Navigate to="posts" />} />
-            <Route path="posts" element={<AllPosts />} />
-            <Route path="posts/:postId" element={<SinglePost />} />
-            <Route path="auth" element={<Auth />}>
-              <Route index element={<Navigate replace to={"login"} />} />
-              <Route path="login" element={<Login />} />
-              <Route path="register" element={<Register />} />
+    <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} />
+      <UserProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Navigate to="posts" />} />
+              <Route path="posts" element={<AllPosts />} />
+              <Route path="posts/:postId" element={<SinglePost />} />
+              <Route path="auth" element={<Auth />}>
+                <Route index element={<Navigate replace to={"login"} />} />
+                <Route path="login" element={<Login />} />
+                <Route path="register" element={<Register />} />
+              </Route>
+              <Route path="account" element={<UserAccount />}>
+                <Route path="info" element={<AccountInfo />} />
+                <Route path="settings" element={<AccountSettings />} />
+                <Route path="close" element={<AccountClose />} />
+              </Route>
             </Route>
-            <Route path="account" element={<UserAccount />}>
-              <Route path="info" element={<AccountInfo />} />
-              <Route path="settings" element={<AccountSettings />} />
-              <Route path="close" element={<AccountClose />} />
-            </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </UserProvider>
+          </Routes>
+        </BrowserRouter>
+      </UserProvider>
+    </QueryClientProvider>
   );
 }
 /*
