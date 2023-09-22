@@ -1,4 +1,4 @@
-import { formatDate } from "../utils";
+import { formatDate } from "../../utils";
 
 export function PostCommentStats({ post }) {
   return (

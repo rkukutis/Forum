@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import AccountSideButtons from "../components/AccountSideButtons";
+import AccountSideButtons from "../features/settings/AccountSideButtons";
 import { useLoggedInUser } from "../contexts/UserContext";
 
 function UserSettings() {

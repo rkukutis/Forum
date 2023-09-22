@@ -1,4 +1,4 @@
-import PostPreviewContainer from "../components/PostPreviewContainer";
+import PostPreviewContainer from "../features/postList/PostPreviewContainer";
 import { PostsProvider } from "../contexts/PostsContext";
 
 function Posts() {

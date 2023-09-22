@@ -1,13 +1,13 @@
-import SettingsTab from "../components/SettingsTab";
-import ErrorMessage from "../components/ErrorMessage";
+import SettingsTab from "../settings/SettingsTab";
+import ErrorMessage from "../../ui/Error";
 import PostPreview from "./PostPreview";
-import Loader from "../components/Loader";
+import Loader from "../../ui/Loader";
 import { useSearchParams } from "react-router-dom";
-import { usePosts } from "../contexts/PostsContext";
+import { usePosts } from "../../contexts/PostsContext";
 import { useEffect, useState } from "react";
-import { useLoggedInUser } from "../contexts/UserContext";
-import Button from "./Button";
-import NewPostForm from "./NewPostForm";
+import { useLoggedInUser } from "../../contexts/UserContext";
+import Button from "../../ui/Button";
+import NewPostForm from "../../ui/NewPostForm";
 
 function PostPreviewContainer() {
   const [displayNewPostForm, setDisplayNewPostForm] = useState();

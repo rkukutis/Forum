@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Button from "./Button";
 import config from "../config.json";
-import Loader from "../components/Loader";
+import Loader from "./Loader";
 
 // I should have perhaps used a 3rd party form library
 

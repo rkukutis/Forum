@@ -1,6 +1,6 @@
-import MainPost from "../components/MainPost";
-import CommentContainer from "../components/CommentContainer";
-import Button from "../components/Button";
+import MainPost from "../features/originalPost/MainPost";
+import CommentContainer from "../features/comments/CommentContainer";
+import Button from "../ui/Button";
 
 function SinglePost() {
   return (

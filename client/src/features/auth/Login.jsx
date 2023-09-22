@@ -1,21 +1,21 @@
-import { useReducer } from 'react';
-import { useLoggedInUser } from '../contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { useReducer } from "react";
+import { useLoggedInUser } from "../../contexts/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const initialState = {
-  error: '',
-  email: '',
-  password: '',
+  error: "",
+  email: "",
+  password: "",
 };
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'emailReceived':
+    case "emailReceived":
       return { ...state, email: action.payload };
-    case 'passwordReceived':
+    case "passwordReceived":
       return { ...state, password: action.payload };
     default:
-      throw new Error('Unknown action');
+      throw new Error("Unknown action");
   }
 }
 
@@ -28,7 +28,7 @@ function Login() {
     e.preventDefault();
     const user = await login(email, password);
     if (user && !loginError) {
-      navigate('/posts');
+      navigate("/posts");
     }
   }
 
@@ -40,7 +40,7 @@ function Login() {
           id="email"
           value={email}
           onChange={(e) =>
-            dispatch({ type: 'emailReceived', payload: e.target.value })
+            dispatch({ type: "emailReceived", payload: e.target.value })
           }
         />
       </div>
@@ -51,7 +51,7 @@ function Login() {
           type="password"
           value={password}
           onChange={(e) =>
-            dispatch({ type: 'passwordReceived', payload: e.target.value })
+            dispatch({ type: "passwordReceived", payload: e.target.value })
           }
         />
       </div>

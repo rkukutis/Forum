@@ -1,6 +1,5 @@
-import Author from "../components/Author";
-import { PostCommentStats } from "./PostCommentStats";
-import Button from "../components/Button";
+import Author from "../../ui/Author";
+import Button from "../../ui/Button";
 import { NavLink } from "react-router-dom";
 
 function PostPreview({ post, postSnippet }) {

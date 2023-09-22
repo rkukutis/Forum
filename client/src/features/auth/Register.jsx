@@ -1,35 +1,35 @@
-import { useReducer } from 'react';
-import { useLoggedInUser } from '../contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { useReducer } from "react";
+import { useLoggedInUser } from "../../contexts/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const initialState = {
-  error: '',
-  username: '',
-  email: '',
-  password: '',
-  passwordConfirm: '',
+  error: "",
+  username: "",
+  email: "",
+  password: "",
+  passwordConfirm: "",
 };
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'usernameReceived':
+    case "usernameReceived":
       return { ...state, username: action.payload };
-    case 'emailReceived':
+    case "emailReceived":
       return { ...state, email: action.payload };
-    case 'passwordReceived':
+    case "passwordReceived":
       return { ...state, password: action.payload };
-    case 'passwordConfirmReceived':
+    case "passwordConfirmReceived":
       return { ...state, passwordConfirm: action.payload };
 
     default:
-      throw new Error('Unknown action');
+      throw new Error("Unknown action");
   }
 }
 
 function Register() {
   const [{ username, password, passwordConfirm, email }, dispatch] = useReducer(
     reducer,
-    initialState
+    initialState,
   );
   const { register, registerError, loggedInUser } = useLoggedInUser();
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ function Register() {
     e.preventDefault();
     await register(username, email, password, passwordConfirm);
     if (!registerError && loggedInUser)
-      navigate('/posts?limit=25&page=1&sortBy=created_at&sortDesc=true');
+      navigate("/posts?limit=25&page=1&sortBy=created_at&sortDesc=true");
   }
 
   return (
@@ -49,7 +49,7 @@ function Register() {
           id="username"
           value={username}
           onChange={(e) =>
-            dispatch({ type: 'usernameReceived', payload: e.target.value })
+            dispatch({ type: "usernameReceived", payload: e.target.value })
           }
         />
       </div>
@@ -59,7 +59,7 @@ function Register() {
           id="email"
           value={email}
           onChange={(e) =>
-            dispatch({ type: 'emailReceived', payload: e.target.value })
+            dispatch({ type: "emailReceived", payload: e.target.value })
           }
         />
       </div>
@@ -70,7 +70,7 @@ function Register() {
           type="password"
           value={password}
           onChange={(e) =>
-            dispatch({ type: 'passwordReceived', payload: e.target.value })
+            dispatch({ type: "passwordReceived", payload: e.target.value })
           }
         />
       </div>
@@ -82,7 +82,7 @@ function Register() {
           value={passwordConfirm}
           onChange={(e) =>
             dispatch({
-              type: 'passwordConfirmReceived',
+              type: "passwordConfirmReceived",
               payload: e.target.value,
             })
           }

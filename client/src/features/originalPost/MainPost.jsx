@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { formatDate } from "../utils";
-import Author from "../components/Author";
+import { formatDate } from "../../utils";
+import Author from "../../ui/Author";
 import { useParams } from "react-router-dom";
-import config from  "../config.json"
-
+import config from "../../config.json";
 
 function MainPost() {
   const { postId } = useParams();
@@ -15,7 +14,9 @@ function MainPost() {
     function () {
       async function fetchPost() {
         try {
-          const res = await fetch(`http://${config.backendBaseAdress}:8000/posts/${postId}`);
+          const res = await fetch(
+            `http://${config.backendBaseAdress}:8000/posts/${postId}`,
+          );
           const { data } = await res.json();
           console.log(data);
           setPost(data);

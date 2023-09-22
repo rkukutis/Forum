@@ -1,6 +1,6 @@
-import { useLoggedInUser } from "../contexts/UserContext";
-import { formatDate } from "../utils";
-import config from "../config.json";
+import { useLoggedInUser } from "../../contexts/UserContext";
+import { formatDate } from "../../utils";
+import config from "../../config.json";
 
 function AccountInfo() {
   const { loggedInUser } = useLoggedInUser();

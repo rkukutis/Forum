@@ -1,7 +1,6 @@
 import { useState } from "react";
-import Button from "./Button";
-import { json } from "react-router-dom";
-import config from  "../config.json"
+import Button from "../../ui/Button";
+import config from "../../config.json";
 
 function AccountSettings() {
   const [image, setImage] = useState({});
@@ -12,13 +11,16 @@ function AccountSettings() {
       const formData = new FormData();
       formData.append("avatar", image);
 
-      const res = await fetch(`http://${config.backendBaseAdress}:8000/users/uploadPhoto`, {
-        method: "POST",
-        mode: "cors",
-        cache: "no-cache",
-        credentials: "include",
-        body: formData,
-      });
+      const res = await fetch(
+        `http://${config.backendBaseAdress}:8000/users/uploadPhoto`,
+        {
+          method: "POST",
+          mode: "cors",
+          cache: "no-cache",
+          credentials: "include",
+          body: formData,
+        },
+      );
       const data = await res.json();
       console.log(data);
     } catch (err) {

@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
-import Button from "../components/Button";
+import Button from "../ui/Button";
 
 function Auth() {
   return (
